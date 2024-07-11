@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Máquinas</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="shortcut icon" type="image/jpg" href="/img/maintenance.ico" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <div class="cadastro">
+          <h1>TPM - Cadastro de Máquinas</h1>
+          <form action="/enviar-cadastro" method="POST" id="defeitosForm">
+            <div class="dados-maquina">
+              <div class="selecao-setores selecao">
+                <label for="setores"
+                  >Escolha os setores que a Máquina trabalha.</label
+                >
+                <div id="setores" class="setores-checkboxes">
+                  <div class="part">
+                    <label
+                      ><input type="checkbox" name="setores" value="Montagem" />
+                      Montagem</label
+                    >
+                    <label
+                      ><input type="checkbox" name="setores" value="Costura" />
+                      Costura</label
+                    >
+                    <label
+                      ><input type="checkbox" name="setores" value="Apoio" />
+                      Apoio</label
+                    >
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="setores"
+                        value="Corte Automático"
+                      />
+                      Corte Automático</label
+                    >
+                    <label
+                      ><input type="checkbox" name="setores" value="Dublagem" />
+                      Dublagem</label
+                    >
+                  </div>
+                  <div class="part">
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="setores"
+                        value="Serigrafia"
+                      />
+                      Serigrafia</label
+                    >
+                    <label
+                      ><input type="checkbox" name="setores" value="Lavagem" />
+                      Lavagem</label
+                    >
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="setores"
+                        value="Pré Solado"
+                      />
+                      Pré Solado</label
+                    >
+                    <label
+                      ><input type="checkbox" name="setores" value="Bordado" />
+                      Bordado</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="maquina selecao">
+                <label for="maquina">Nome da Máquina</label>
+                <input
+                  type="text"
+                  name="maquina"
+                  id="input-maquina"
+                  placeholder="Nome da Máquina"
+                />
+              </div>
+            </div>
+
+            <div class="selecao-defeito-checklist">
+              <div class="defeitos">
+                <div id="defeitosList"></div>
+                <button
+                  type="button"
+                  class="btn-adicionar"
+                  onclick="adicionarDefeito()"
+                >
+                  + Adicionar Defeito
+                </button>
+              </div>
+              <div class="textGuide">
+                <label for="checklist">Checklist</label>
+                <textarea
+                  name="checklist"
+                  id="inputChecklist"
+                  placeholder="Itens para Verificar"
+                ></textarea>
+                <div class="tooltip">
+                  Insira os itens separados por vírgula.
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-enviar">Enviar</button>
+          </form>
+        </div>
+
+        <script src="/js/manualMaq.js"></script>
+      </div>
+    </div>
+  </body>
+</html>
