@@ -1,15 +1,14 @@
 <template>
-  <h1>Hello world!</h1>
-  <lista-component :meuNome="nome" />
-  <lista-component :meuNome="'Hendrius Félix'" />
-  <input type="text" v-model="nome" name="" id="" />
-  <lista-component :meuNome="maquinas" />
-  <button @click="testeFunc()">Button</button>
+  <div>
+    <h1>Máquinas</h1>
+    <lista-component :maquinas="maquinasObject" />
+  </div>
 </template>
 
 <script>
 import ListaComponent from "../components/ListaComponent.vue";
 import axios from "axios";
+
 export default {
   name: "manutencao-view",
   components: {
@@ -17,9 +16,11 @@ export default {
   },
   data() {
     return {
-      nome: "",
-      maquinas: this.getMaquinas(),
+      maquinasObject: {},
     };
+  },
+  mounted() {
+    this.getMaquinas();
   },
   methods: {
     testeFunc() {
@@ -33,7 +34,15 @@ export default {
         });
     },
     getMaquinas() {
-      axios.get("http://localhost:3000/manual_maqs");
+      axios
+        .get("http://localhost:3000/api/manual_maqs")
+        .then((response) => {
+          console.log(response.data);
+          this.maquinasObject = response.data;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
   },
 };
