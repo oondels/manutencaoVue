@@ -1,12 +1,19 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../sequelize");
+const { pool } = require("../database/config/config.js");
 
-const Maquina = sequelize.define("Maquina", {
-  nome: {
-    type: DataTypes.STRING,
-    allownull: false,
-    unique: false,
-  },
-});
+const criarMaquina = async (nome) => {
+  const client = await pool.connect();
+  try {
+    const nemMaquina = await client.query(
+      "INSERT INTO Maquina (nome) VALUES ($1) RETURNING *",
+      [nome]
+    );
+    return nemMaquina.rows[0];
+  } catch (error) {
+    console.error("Erro ao criar Maquina:", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
 
-module.exports = Maquina;
+module.exports = { criarMaquina };

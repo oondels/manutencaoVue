@@ -1,5 +1,10 @@
-const { sequelize, Setor, Maquina, Categoria, Problema } = require("./models");
-const manual_maquinas = require("./database/manual_maqs_noSQL.json");
+const manual_maquinas = require("./manual_maqs_noSQL.json");
+const {
+  criarCategoria,
+  criarMaquina,
+  criarProblema,
+  criarSetor,
+} = require("../models/index");
 
 async function maquinasDB() {
   try {
@@ -7,7 +12,7 @@ async function maquinasDB() {
     console.log("Conexão com banco de dados estabelecida");
 
     for (const setorNome in manual_maquinas) {
-      const setor = await Setor.create({ nome: setorNome });
+      const setor = await criarSetor(setorNome);
 
       const maquinas = manual_maquinas[setorNome];
       for (const maquinaNome in maquinas) {
