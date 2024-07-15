@@ -1,14 +1,14 @@
 <template>
-  <manutencao-view />
+  <manutencao-component />
 </template>
 
 <script>
-import ManutencaoView from "./view/ManutencaoView.vue";
+import ManutencaoComponent from "./components/ManutencaoComponent.vue";
 
 export default {
   name: "App",
   components: {
-    ManutencaoView,
+    ManutencaoComponent,
   },
 };
 </script>

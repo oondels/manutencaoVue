@@ -59,7 +59,7 @@
 import axios from "axios";
 
 export default {
-  name: "ManutencaoView",
+  name: "ManutencaoComponent",
   data() {
     return {
       setor: "",
