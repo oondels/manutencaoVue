@@ -2,9 +2,13 @@
   <div class="container">
     <div class="wrapper">
       <h1>Manual de Máquinas</h1>
-      <input type="text" placeholder="Pesquisar Setor" v-model="setor" />
-      <input type="text" placeholder="Pesquisar Máquina" v-model="maquina" />
-      <button @click="getMaquinas">Pesquisar</button>
+      <div class="pesquisa">
+        <div class="select-lists">
+          <v-select class="select" label="Setores" :items="listaSetores" v-model="setor"></v-select>
+          <v-select class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
+        </div>
+        <v-btn @click="getMaquinas">Pesquisa</v-btn>
+      </div>
       <div class="main">
         <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
           <h1>{{ setorNome }}</h1>
@@ -19,8 +23,8 @@
                     {{ categoriaNome }}
                   </h3>
 
-                  <div v-if="problemas.expandido">
-                    <ul class="problemas-list container-problema">
+                  <div class="container-problema" v-if="problemas.expandido">
+                    <ul class="problemas-list">
                       <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
                         <h4>{{ problema }}</h4>
                       </li>
@@ -49,14 +53,20 @@ export default {
       maquinasObject: {},
       categoriasCheck: false,
       problemasCheck: false,
+      listaSetores: [],
+      listaMaquinas: [],
     };
   },
   mounted() {
     this.getMaquinas();
   },
+  watch: {
+    setor(newSetor) {
+      this.updateListaMaquinas(newSetor);
+    },
+  },
   methods: {
     getMaquinas() {
-      // Pegando valores de pesquisa
       const params = {};
       if (this.setor) params.setor = this.setor;
       if (this.maquina) params.maquina = this.maquina;
@@ -70,12 +80,13 @@ export default {
           Object.keys(maquinasData).forEach((setorNome) => {
             formattedMaquinas[setorNome] = {};
 
+            this.listaSetores.push(setorNome);
+
             Object.keys(maquinasData[setorNome]).forEach((maquinaNome) => {
               formattedMaquinas[setorNome][maquinaNome] = {};
               formattedMaquinas[setorNome][maquinaNome].expandido = false;
 
               Object.keys(maquinasData[setorNome][maquinaNome]).forEach((categoriaNome) => {
-                console.log(categoriaNome);
                 formattedMaquinas[setorNome][maquinaNome][categoriaNome] = {};
                 formattedMaquinas[setorNome][maquinaNome][categoriaNome] = maquinasData[setorNome][maquinaNome][categoriaNome];
                 formattedMaquinas[setorNome][maquinaNome][categoriaNome].expandido = false;
@@ -83,7 +94,10 @@ export default {
             });
           });
 
-          // Atualizar o estado com os dados formatados
+          if (this.setor) {
+            this.updateListaMaquinas(this.setor);
+          }
+
           this.maquinasObject = formattedMaquinas;
         })
         .catch((error) => {
@@ -106,11 +120,29 @@ export default {
         }
       }
     },
+    updateListaMaquinas(setor) {
+      this.listaMaquinas = [];
+      if (this.maquinasObject && this.maquinasObject[setor]) {
+        this.listaMaquinas = Object.keys(this.maquinasObject[setor]);
+      } else {
+        this.listaMaquinas = [];
+      }
+    },
   },
 };
 </script>
 
 <style>
+.select {
+  width: 300px;
+  padding: 0 10px;
+}
+
+.select-lists {
+  display: flex;
+  flex-direction: row;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -201,14 +233,6 @@ h1 {
 
 .categoria ul {
   padding: 10px;
-  list-style-type: none;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.categoria ul li {
-  padding: 8px;
 }
 
 ul {
@@ -228,8 +252,9 @@ ul {
   transition: transform 0.2s;
 }
 
-.container-problema:hover {
+.container-problema li:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .container-problema li {
@@ -240,6 +265,11 @@ ul {
   font-family: "Arial", sans-serif;
   font-size: 16px;
   color: #333;
+  padding: 20px;
+  margin-top: 5px;
+  list-style-type: none;
+  background-color: #fff;
+  border-radius: 8px;
 }
 
 .container-problema li::before {
