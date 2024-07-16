@@ -4,51 +4,33 @@
       <h1>Manual de Máquinas</h1>
       <input type="text" placeholder="Pesquisar Setor" v-model="setor" />
       <input type="text" placeholder="Pesquisar Máquina" v-model="maquina" />
-      <button>Pesquisar</button>
+      <button @click="getMaquinas">Pesquisar</button>
       <div class="main">
-        <div
-          class="setores-list"
-          v-for="(setor, setorIndex) in maquinasObject"
-          :key="setorIndex"
-        >
-          <h1>{{ setor.nome }}</h1>
-          <div
-            class="maquinas-list"
-            v-for="(maquina, maquinaIndex) in setor.Maquinas"
-            :key="maquinaIndex"
-          >
-            <h3
-              class="toggle-button"
-              @click="toggleMaquina(setorIndex, maquinaIndex)"
-            >
-              {{ maquina.nome }}
-            </h3>
-            <div class="categorias-list" v-if="maquina.expandido">
-              <div
-                class="categoria"
-                v-for="(categoria, categoriaIndex) in maquina.Categoria"
-                :key="categoriaIndex"
-              >
-                <h4
-                  class="toggle-button"
-                  @click="
-                    toggleCategoria(setorIndex, maquinaIndex, categoriaIndex)
-                  "
-                >
-                  {{ categoria.nome }}
-                </h4>
-                <ul class="problemas-list" v-if="categoria.expandido">
-                  <div
-                    class="container-problema"
-                    v-for="(problema, problemaIndex) in categoria.Problemas"
-                    :key="problemaIndex"
-                  >
-                    <li class="problema-item">{{ problema.descricao }}</li>
+        <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
+          <h1>{{ setorNome }}</h1>
+
+          <div class="maquinas-list" v-if="maquinas">
+            <div v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
+              <h2 @click="toggleMaquina(setorNome, maquinaNome)" class="toggle-button">{{ maquinaNome }}</h2>
+
+              <div v-if="categorias.expandido" class="categorias-list">
+                <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
+                  <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)" class="toggle-button">
+                    {{ categoriaNome }}
+                  </h3>
+
+                  <div v-if="problemas.expandido">
+                    <ul class="problemas-list container-problema">
+                      <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
+                        <h4>{{ problema }}</h4>
+                      </li>
+                    </ul>
                   </div>
-                </ul>
+                </div>
               </div>
             </div>
           </div>
+          <div v-else><h2>Sem máquinas no setor!</h2></div>
         </div>
       </div>
     </div>
@@ -65,6 +47,8 @@ export default {
       setor: "",
       maquina: "",
       maquinasObject: {},
+      categoriasCheck: false,
+      problemasCheck: false,
     };
   },
   mounted() {
@@ -72,35 +56,55 @@ export default {
   },
   methods: {
     getMaquinas() {
+      // Pegando valores de pesquisa
+      const params = {};
+      if (this.setor) params.setor = this.setor;
+      if (this.maquina) params.maquina = this.maquina;
       axios
-        .get("http://localhost:3000/api/manual_maqs", {})
+        .get("http://localhost:3000/api/manual_maqs", { params })
         .then((response) => {
-          console.log(response.data);
-          this.maquinasObject = response.data;
+          const maquinasData = response.data;
 
-          this.maquinasObject.forEach((setor) => {
-            setor.Maquinas.forEach((maquina) => {
-              this.$set(maquina, "expandido", false);
-              maquina.Categoria.forEach((categoria) => {
-                this.$set(categoria, "expandido", false);
+          const formattedMaquinas = {};
+
+          Object.keys(maquinasData).forEach((setorNome) => {
+            formattedMaquinas[setorNome] = {};
+
+            Object.keys(maquinasData[setorNome]).forEach((maquinaNome) => {
+              formattedMaquinas[setorNome][maquinaNome] = {};
+              formattedMaquinas[setorNome][maquinaNome].expandido = false;
+
+              Object.keys(maquinasData[setorNome][maquinaNome]).forEach((categoriaNome) => {
+                console.log(categoriaNome);
+                formattedMaquinas[setorNome][maquinaNome][categoriaNome] = {};
+                formattedMaquinas[setorNome][maquinaNome][categoriaNome] = maquinasData[setorNome][maquinaNome][categoriaNome];
+                formattedMaquinas[setorNome][maquinaNome][categoriaNome].expandido = false;
               });
             });
           });
+
+          // Atualizar o estado com os dados formatados
+          this.maquinasObject = formattedMaquinas;
         })
         .catch((error) => {
           console.error("Error:", error);
         });
     },
-    toggleMaquina(setorIndex, maquinaIndex) {
-      const maquina = this.maquinasObject[setorIndex].Maquinas[maquinaIndex];
-      maquina.expandido = !maquina.expandido;
+    toggleMaquina(setorNome, maquinaNome) {
+      const setor = this.maquinasObject[setorNome];
+      if (setor && setor[maquinaNome]) {
+        setor[maquinaNome].expandido = !setor[maquinaNome].expandido;
+      }
     },
-    toggleCategoria(setorIndex, maquinaIndex, categoriaIndex) {
-      const categoria =
-        this.maquinasObject[setorIndex].Maquinas[maquinaIndex].Categoria[
-          categoriaIndex
-        ];
-      categoria.expandido = !categoria.expandido;
+    toggleCategoria(setorNome, maquinaNome, categoriaNome) {
+      const maquina = this.maquinasObject[setorNome][maquinaNome];
+
+      if (maquina && maquina[categoriaNome]) {
+        const categoria = maquina[categoriaNome];
+        if (categoria && categoria.expandido !== undefined) {
+          categoria.expandido = !categoria.expandido;
+        }
+      }
     },
   },
 };

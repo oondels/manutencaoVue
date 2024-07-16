@@ -41,17 +41,31 @@ server.listen(port, () => {
 });
 
 app.get("/tables", async (req, res) => {
-  const [results] = await sequelize.query(
-    "SELECT name FROM sqlite_master WHERE type='table'"
-  );
+  const [results] = await sequelize.query("SELECT name FROM sqlite_master WHERE type='table'");
   res.json(results);
 });
 
 app.get("/api/manual_maqs", async (req, res) => {
+  const { setor, maquina } = req.query;
+
+  let setorQuery = "";
+  let maquinaQuery = "";
+  const values = [];
+
+  if (setor) {
+    setorQuery = "AND s.nome = $1";
+    values.push(setor);
+  }
+
+  if (maquina) {
+    maquinaQuery = setor ? "AND m.nome = $2" : "AND m.nome = $1";
+    values.push(maquina);
+  }
+
   try {
     const client = await pool.connect();
 
-    const result = await client.query(`
+    const query = `
       SELECT
           s.id AS setor_id,
           s.nome AS setor_nome,
@@ -65,8 +79,11 @@ app.get("/api/manual_maqs", async (req, res) => {
       JOIN Maquinas m ON sm.maquina_id = m.id
       LEFT JOIN Categoria c ON m.id = c.maquina_id
       LEFT JOIN Problema p ON c.id = p.categoria_id
+      WHERE 1=1 ${setorQuery} ${maquinaQuery}
       GROUP BY s.id, m.id, c.id
-  `);
+    `;
+
+    const result = await client.query(query, values);
     client.release();
 
     let manualMaquinas = {};
@@ -90,9 +107,7 @@ app.get("/api/manual_maqs", async (req, res) => {
       }
 
       problemas.forEach((problema) => {
-        manualMaquinas[setorNome][maquinaNome][categoriaNome].push(
-          problema.descricao
-        );
+        manualMaquinas[setorNome][maquinaNome][categoriaNome].push(problema.descricao);
       });
     });
 
