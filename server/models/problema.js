@@ -1,11 +1,11 @@
 const { pool } = require("../database/config/config.js");
 
-const criarProblema = async (descricao) => {
+const criarProblema = async (descricao, categoriaId) => {
   const client = await pool.connect();
   try {
     const nomeProblema = await client.query(
-      "INSERT INTO Problema (descricao) VALUES ($1) RETURNING *",
-      [descricao]
+      "INSERT INTO Problema (descricao, categoria_id) VALUES ($1, $2) RETURNING *",
+      [descricao, categoriaId]
     );
     return nomeProblema.rows[0];
   } catch (error) {

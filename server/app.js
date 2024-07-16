@@ -1,13 +1,11 @@
 const express = require("express");
 const path = require("path");
-const sequelize = require("./sequelize");
-const { Setor, Maquina, Categoria, Problema } = require("./models");
-const User = require("./models/user");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const http = require("http");
 const cors = require("cors");
+const { pool } = require("./database/config/config");
 
 const app = express();
 const port = 3000;
@@ -38,21 +36,9 @@ const authLogin = (req, res, next) => {
   }
 };
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Conexão com Banco de dados estabelecida com sucesso!");
-
-    server.listen(port, () => {
-      console.log("Servidor rodando na porta 3000.");
-    });
-  })
-  .catch((erro) => {
-    console.error(
-      "Não foi possivel estabelecer conexão com banco de dados:",
-      erro
-    );
-  });
+server.listen(port, () => {
+  console.log("Servidor rodando na porta:", port);
+});
 
 app.get("/tables", async (req, res) => {
   const [results] = await sequelize.query(
@@ -63,24 +49,57 @@ app.get("/tables", async (req, res) => {
 
 app.get("/api/manual_maqs", async (req, res) => {
   try {
-    const manualMaqs = await Setor.findAll({
-      include: [
-        {
-          model: Maquina,
-          include: [
-            {
-              model: Categoria,
-              include: [Problema],
-            },
-          ],
-        },
-      ],
+    const client = await pool.connect();
+
+    const result = await client.query(`
+      SELECT
+          s.id AS setor_id,
+          s.nome AS setor_nome,
+          m.id AS maquina_id,
+          m.nome AS maquina_nome,
+          c.id AS categoria_id,
+          c.nome AS categoria_nome,
+          json_agg(p.*) AS problemas
+      FROM Setor s
+      JOIN maquina_setor sm ON s.id = sm.setor_id
+      JOIN Maquinas m ON sm.maquina_id = m.id
+      LEFT JOIN Categoria c ON m.id = c.maquina_id
+      LEFT JOIN Problema p ON c.id = p.categoria_id
+      GROUP BY s.id, m.id, c.id
+  `);
+    client.release();
+
+    let manualMaquinas = {};
+
+    result.rows.forEach((row) => {
+      const setorNome = row.setor_nome;
+      const maquinaNome = row.maquina_nome;
+      const categoriaNome = row.categoria_nome;
+      const problemas = row.problemas;
+
+      if (!manualMaquinas[setorNome]) {
+        manualMaquinas[setorNome] = {};
+      }
+
+      if (!manualMaquinas[setorNome][maquinaNome]) {
+        manualMaquinas[setorNome][maquinaNome] = {};
+      }
+
+      if (!manualMaquinas[setorNome][maquinaNome][categoriaNome]) {
+        manualMaquinas[setorNome][maquinaNome][categoriaNome] = [];
+      }
+
+      problemas.forEach((problema) => {
+        manualMaquinas[setorNome][maquinaNome][categoriaNome].push(
+          problema.descricao
+        );
+      });
     });
 
-    res.json(manualMaqs);
+    res.json(manualMaquinas);
   } catch (error) {
-    console.error("Erro ao buscar os dados:", error);
-    res.status(500).send("Erro ao buscar dados!");
+    console.error("Erro ao buscar dados:", error);
+    res.status(500).json({ error: "Erro ao buscar dados de manualmaquinas" });
   }
 });
 
@@ -119,16 +138,6 @@ app.post("/login-token", async (req, res) => {
     res.redirect(`/manualmaquinas`);
   } catch (error) {
     console.error("Erro ao buscar Usuário:", error);
-  }
-});
-
-app.get("/manualmaquinas", async (req, res) => {
-  const userId = req.session.userId;
-  try {
-    const user = await User.findByPk(userId);
-    res.render("manual_maqs", { user });
-  } catch (error) {
-    res.json({ error: "Erro ao buscar usuário" });
   }
 });
 
