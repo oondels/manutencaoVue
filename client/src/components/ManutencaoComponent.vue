@@ -11,10 +11,17 @@
           <v-select class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
         </div>
         <v-btn @click="getMaquinas">Pesquisa</v-btn>
-        <v-btn>Cadastrar</v-btn>
+
+        <v-expansion-panels>
+          <v-expansion-panel title="Cadastrar Máquina">
+            <v-expansion-panel-text>
+              <cadastro-maquinas-component />
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </div>
       <div class="main">
-        <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
+        <diWv class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
           <h1>{{ setorNome }}</h1>
 
           <div class="maquinas-list" v-if="maquinas">
@@ -45,7 +52,7 @@
             </div>
           </div>
           <div v-else><h2>Sem máquinas no setor!</h2></div>
-        </div>
+        </diWv>
       </div>
     </div>
   </div>
@@ -55,9 +62,13 @@
 import mecanicoIcon from "@/assets/mecanico-icon.png";
 import operacionalIcon from "@/assets/operador-icon.png";
 import axios from "axios";
+import CadastroMaquinasComponent from "./CadastroMaquinasComponent.vue";
 
 export default {
   name: "ManutencaoComponent",
+  components: {
+    CadastroMaquinasComponent,
+  },
   data() {
     return {
       setor: "",
@@ -67,6 +78,11 @@ export default {
       problemasCheck: false,
       listaSetores: [],
       listaMaquinas: [],
+      name: "",
+      nameRules: [(v) => !!v || "Name is required", (v) => (v && v.length <= 10) || "Name must be less than 10 characters"],
+      select: null,
+      items: ["Item 1", "Item 2", "Item 3", "Item 4"],
+      checkbox: false,
     };
   },
   mounted() {
@@ -116,26 +132,26 @@ export default {
       }
       return "";
     },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    },
   },
 };
 </script>
 
 <style>
+.v-expansion-panel-text__wrapper {
+  background: #f9f9f9;
+  border-radius: 10px;
+}
 .select-lists {
   display: flex;
   flex-direction: row;
 }
 
-.clear-icon {
-  cursor: pointer;
-  margin-left: -30px; /* Ajuste o posicionamento do ícone conforme necessário */
-  margin-top: 12px; /* Ajuste o posicionamento do ícone conforme necessário */
-  color: #757575; /* Cor do ícone */
-}
-
-.clear-icon:hover {
-  color: #f44336; /* Cor do ícone ao passar o mouse */
-}
 .title {
   margin-bottom: 40px;
   display: flex;
@@ -237,7 +253,6 @@ h1 {
   padding: 18px;
   overflow: hidden;
   background-color: #f1f1f1;
-  transition: max-height 0.7s ease, opacity 0.5s ease;
 }
 
 .toggle-button {
