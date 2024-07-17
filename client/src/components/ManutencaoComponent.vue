@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <div class="wrapper">
-      <h1>Manual de Máquinas</h1>
+      <div class="title">
+        <v-img src="@/assets/maintenance.png"></v-img>
+        <h1>TPM - Manual de Máquinas</h1>
+      </div>
       <div class="pesquisa">
         <div class="select-lists">
           <v-select class="select" label="Setores" :items="listaSetores" v-model="setor"></v-select>
@@ -14,7 +17,7 @@
           <h1>{{ setorNome }}</h1>
 
           <div class="maquinas-list" v-if="maquinas">
-            <div v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
+            <div class="maquina" v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
               <h2 @click="toggleMaquina(setorNome, maquinaNome)" class="toggle-button">{{ maquinaNome }}</h2>
 
               <div v-if="categorias.expandido" class="categorias-list">
@@ -27,6 +30,7 @@
                     <ul class="problemas-list">
                       <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
                         <h4>{{ problema }}</h4>
+                        <v-img :src="getIcon(problema)"></v-img>
                       </li>
                     </ul>
                   </div>
@@ -42,6 +46,8 @@
 </template>
 
 <script>
+import mecanicoIcon from "@/assets/mecanico-icon.png";
+import operacionalIcon from "@/assets/operador-icon.png";
 import axios from "axios";
 
 export default {
@@ -128,11 +134,37 @@ export default {
         this.listaMaquinas = [];
       }
     },
+    getIcon(problema) {
+      if (problema.includes("Mecânico")) {
+        return mecanicoIcon;
+      } else if (problema.includes("Operacional")) {
+        return operacionalIcon;
+      }
+      return "";
+    },
   },
 };
 </script>
 
 <style>
+.title {
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title h1 {
+  font-size: 35px;
+  color: #0056b3;
+  margin-top: 0;
+}
+
+.title .v-img {
+  width: 150px;
+  padding-right: 20px;
+}
+
 .select {
   width: 300px;
   padding: 0 10px;
@@ -224,7 +256,7 @@ h1 {
   color: #333;
   font-weight: 500;
   font-size: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 30px;
 }
 
 .toggle-button:hover {
@@ -253,8 +285,13 @@ ul {
 }
 
 .container-problema li:hover {
-  transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container-problema .v-img {
+  position: absolute;
+  right: 40px;
+  width: 35px;
 }
 
 .container-problema li {
@@ -266,7 +303,7 @@ ul {
   font-size: 16px;
   color: #333;
   padding: 20px;
-  margin-top: 5px;
+  margin-top: 15px;
   list-style-type: none;
   background-color: #fff;
   border-radius: 8px;
