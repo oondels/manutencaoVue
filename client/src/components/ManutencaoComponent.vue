@@ -7,10 +7,11 @@
       </div>
       <div class="pesquisa">
         <div class="select-lists">
-          <v-select class="select" label="Setores" :items="listaSetores" v-model="setor"></v-select>
+          <v-select clearable class="select" label="Setores" :items="listaSetores" v-model="setor"></v-select>
           <v-select class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
         </div>
         <v-btn @click="getMaquinas">Pesquisa</v-btn>
+        <v-btn>Cadastrar</v-btn>
       </div>
       <div class="main">
         <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
@@ -18,26 +19,29 @@
 
           <div class="maquinas-list" v-if="maquinas">
             <div class="maquina" v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
-              <h2 @click="toggleMaquina(setorNome, maquinaNome)" class="toggle-button">{{ maquinaNome }}</h2>
+              <v-expansion-panels>
+                <v-expansion-panel :title="maquinaNome">
+                  <v-expansion-panel-text>
+                    <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
+                      <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)" class="toggle-button"></h3>
 
-              <div v-if="categorias.expandido" class="categorias-list">
-                <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
-                  <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)" class="toggle-button"></h3>
-
-                  <v-expansion-panels>
-                    <v-expansion-panel :title="categoriaNome">
-                      <v-expansion-panel-text>
-                        <ul class="problemas-list">
-                          <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
-                            <h4>{{ problema }}</h4>
-                            <v-img :src="getIcon(problema)"></v-img>
-                          </li>
-                        </ul>
-                      </v-expansion-panel-text>
-                    </v-expansion-panel>
-                  </v-expansion-panels>
-                </div>
-              </div>
+                      <v-expansion-panels>
+                        <v-expansion-panel :title="categoriaNome">
+                          <v-expansion-panel-text>
+                            <ul class="problemas-list">
+                              <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
+                                <h4>{{ problema }}</h4>
+                                <v-img :src="getIcon(problema)"></v-img>
+                                <span style="display: none" class="text-message">Span</span>
+                              </li>
+                            </ul>
+                          </v-expansion-panel-text>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
+                    </div>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </div>
           </div>
           <div v-else><h2>Sem máquinas no setor!</h2></div>
@@ -81,52 +85,20 @@ export default {
       axios
         .get("http://localhost:3000/api/manual_maqs", { params })
         .then((response) => {
-          const maquinasData = response.data;
+          this.maquinasObject = response.data;
 
-          const formattedMaquinas = {};
-
-          Object.keys(maquinasData).forEach((setorNome) => {
-            formattedMaquinas[setorNome] = {};
-
+          Object.keys(this.maquinasObject).forEach((setorNome) => {
             this.listaSetores.push(setorNome);
-
-            Object.keys(maquinasData[setorNome]).forEach((maquinaNome) => {
-              formattedMaquinas[setorNome][maquinaNome] = {};
-              formattedMaquinas[setorNome][maquinaNome].expandido = false;
-
-              Object.keys(maquinasData[setorNome][maquinaNome]).forEach((categoriaNome) => {
-                formattedMaquinas[setorNome][maquinaNome][categoriaNome] = {};
-                formattedMaquinas[setorNome][maquinaNome][categoriaNome] = maquinasData[setorNome][maquinaNome][categoriaNome];
-                formattedMaquinas[setorNome][maquinaNome][categoriaNome].expandido = false;
-              });
-            });
           });
-
           if (this.setor) {
             this.updateListaMaquinas(this.setor);
           }
-
-          this.maquinasObject = formattedMaquinas;
         })
         .catch((error) => {
           console.error("Error:", error);
         });
-    },
-    toggleMaquina(setorNome, maquinaNome) {
-      const setor = this.maquinasObject[setorNome];
-      if (setor && setor[maquinaNome]) {
-        setor[maquinaNome].expandido = !setor[maquinaNome].expandido;
-      }
-    },
-    toggleCategoria(setorNome, maquinaNome, categoriaNome) {
-      const maquina = this.maquinasObject[setorNome][maquinaNome];
-
-      if (maquina && maquina[categoriaNome]) {
-        const categoria = maquina[categoriaNome];
-        if (categoria && categoria.expandido !== undefined) {
-          categoria.expandido = !categoria.expandido;
-        }
-      }
+      this.setor = "";
+      this.maquina = "";
     },
     updateListaMaquinas(setor) {
       this.listaMaquinas = [];
@@ -149,6 +121,21 @@ export default {
 </script>
 
 <style>
+.select-lists {
+  display: flex;
+  flex-direction: row;
+}
+
+.clear-icon {
+  cursor: pointer;
+  margin-left: -30px; /* Ajuste o posicionamento do ícone conforme necessário */
+  margin-top: 12px; /* Ajuste o posicionamento do ícone conforme necessário */
+  color: #757575; /* Cor do ícone */
+}
+
+.clear-icon:hover {
+  color: #f44336; /* Cor do ícone ao passar o mouse */
+}
 .title {
   margin-bottom: 40px;
   display: flex;
