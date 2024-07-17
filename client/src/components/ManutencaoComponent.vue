@@ -294,6 +294,25 @@ ul {
 
 .problema-item {
   min-width: 600px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+  color: #333;
+  position: relative;
+}
+
+.problema-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 90%;
+  height: 1px;
+  background-color: #ddd;
+  margin-left: 5%;
 }
 
 .problema-item .v-img {
