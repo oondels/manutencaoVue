@@ -22,18 +22,20 @@
 
               <div v-if="categorias.expandido" class="categorias-list">
                 <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
-                  <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)" class="toggle-button">
-                    {{ categoriaNome }}
-                  </h3>
+                  <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)" class="toggle-button"></h3>
 
-                  <div class="container-problema" v-if="problemas.expandido">
-                    <ul class="problemas-list">
-                      <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
-                        <h4>{{ problema }}</h4>
-                        <v-img :src="getIcon(problema)"></v-img>
-                      </li>
-                    </ul>
-                  </div>
+                  <v-expansion-panels>
+                    <v-expansion-panel :title="categoriaNome">
+                      <v-expansion-panel-text>
+                        <ul class="problemas-list">
+                          <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
+                            <h4>{{ problema }}</h4>
+                            <v-img :src="getIcon(problema)"></v-img>
+                          </li>
+                        </ul>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
                 </div>
               </div>
             </div>
@@ -267,34 +269,7 @@ h1 {
   padding: 10px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.container-problema {
-  position: relative;
-  padding-right: 50px;
-  margin-bottom: 10px;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.container-problema li:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.container-problema .v-img {
-  position: absolute;
-  right: 40px;
-  width: 35px;
-}
-
-.container-problema li {
+.categoria ul li {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -302,16 +277,45 @@ ul {
   font-family: "Arial", sans-serif;
   font-size: 16px;
   color: #333;
-  padding: 20px;
+  padding: 15px;
   margin-top: 15px;
   list-style-type: none;
   background-color: #fff;
   border-radius: 8px;
 }
 
-.container-problema li::before {
+.categoria .toggle-button {
+  padding: 0;
+  margin: 10px;
+}
+
+.categoria ul li::before {
   content: "🔧";
   margin-right: 10px;
   font-size: 18px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.categoria ul li:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.problema-item {
+  min-width: 600px;
+}
+
+.problema-item .v-img {
+  position: absolute;
+  right: 40px;
+  width: 35px;
+}
+
+.v-expansion-panel {
+  padding: 7px;
 }
 </style>
