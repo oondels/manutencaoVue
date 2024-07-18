@@ -16,7 +16,12 @@
             <v-select class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
           </div>
         </div>
-        <v-btn class="pesquisa-btn" @click="getMaquinas">Pesquisar</v-btn>
+        <v-btn class="pesquisa-btn" @click="displayMaquinas">Pesquisar</v-btn>
+        <div class="escolher-categoria">
+          <p>Deseja aplicar um filtro?</p>
+          <v-btn @click="updateDisplayMaquinas('Mecânico')">Mecânico</v-btn>
+          <v-btn @click="updateDisplayMaquinas('Operacional')">Operacional</v-btn>
+        </div>
 
         <div class="cadastro-painel">
           <v-expansion-panels class="expandir-button">
@@ -82,10 +87,7 @@ export default {
       setor: "",
       maquina: "",
       maquinasObject: {},
-      categoriasCheck: false,
-      problemasCheck: false,
-      listaSetores: [],
-      listaMaquinas: [],
+      maquinasObjectOriginal: {},
       name: "",
       nameRules: [(v) => !!v || "Name is required", (v) => (v && v.length <= 10) || "Name must be less than 10 characters"],
       select: null,
@@ -94,7 +96,7 @@ export default {
     };
   },
   mounted() {
-    this.getMaquinas();
+    this.displayMaquinas();
   },
   watch: {
     setor(newSetor) {
@@ -102,7 +104,7 @@ export default {
     },
   },
   methods: {
-    getMaquinas() {
+    displayMaquinas() {
       const params = {};
       if (this.setor) params.setor = this.setor;
       if (this.maquina) params.maquina = this.maquina;
@@ -110,6 +112,7 @@ export default {
         .get("http://localhost:3000/api/manual_maqs", { params })
         .then((response) => {
           this.maquinasObject = response.data;
+          this.maquinasObjectOriginal = JSON.parse(JSON.stringify(this.maquinasObject));
 
           Object.keys(this.maquinasObject).forEach((setorNome) => {
             this.listaSetores.push(setorNome);
@@ -132,6 +135,26 @@ export default {
         this.listaMaquinas = [];
       }
     },
+    updateDisplayMaquinas(selecao) {
+      this.maquinasObject = JSON.parse(JSON.stringify(this.maquinasObjectOriginal));
+
+      const newMaquinasObject = {};
+      for (const setor in this.maquinasObject) {
+        newMaquinasObject[setor] = {};
+        for (const maquina in this.maquinasObject[setor]) {
+          newMaquinasObject[setor][maquina] = {};
+          for (const categoria in this.maquinasObject[setor][maquina]) {
+            newMaquinasObject[setor][maquina][categoria] = [];
+            this.maquinasObject[setor][maquina][categoria].forEach((solucao) => {
+              if (solucao.includes(selecao)) {
+                newMaquinasObject[setor][maquina][categoria].push(solucao);
+              }
+            });
+          }
+        }
+      }
+      this.maquinasObject = newMaquinasObject;
+    },
     getIcon(problema) {
       if (problema.includes("Mecânico")) {
         return mecanicoIcon;
@@ -139,12 +162,6 @@ export default {
         return operacionalIcon;
       }
       return "";
-    },
-    reset() {
-      this.$refs.form.reset();
-    },
-    resetValidation() {
-      this.$refs.form.resetValidation();
     },
   },
 };
