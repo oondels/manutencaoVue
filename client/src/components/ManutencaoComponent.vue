@@ -35,17 +35,17 @@
           <div class="maquinas-list" v-if="maquinas">
             <div class="maquina" v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
               <v-expansion-panels>
-                <v-expansion-panel :title="maquinaNome">
+                <v-expansion-panel class="toggle-button" :title="maquinaNome">
                   <v-expansion-panel-text>
                     <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
-                      <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)" class="toggle-button"></h3>
+                      <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)"></h3>
 
                       <v-expansion-panels>
-                        <v-expansion-panel :title="categoriaNome">
+                        <v-expansion-panel class="toggle-button" :title="categoriaNome">
                           <v-expansion-panel-text>
                             <ul class="problemas-list">
                               <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
-                                <h4 class="toggle-button">{{ problema }}</h4>
+                                <h4>{{ problema }}</h4>
                                 <v-img :src="getIcon(problema)"></v-img>
                                 <span style="display: none" class="text-message">Span</span>
                               </li>
@@ -242,7 +242,7 @@ main {
 
 h1 {
   text-align: center;
-  margin-bottom: 20px;
+  padding-top: 30px;
   color: #0056b3;
 }
 
@@ -267,7 +267,7 @@ h1 {
   color: #333;
   font-weight: 500;
   font-size: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 5px;
 }
 
 .v-expansion-panel.cadastrar-maquina {
@@ -299,8 +299,6 @@ h1 {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
-  font-family: "Arial", sans-serif;
   font-size: 16px;
   color: #333;
   padding: 20px;
@@ -311,6 +309,7 @@ h1 {
   transition: transform 0.2s;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 600px;
 }
 
 .categoria ul li:hover {
@@ -345,17 +344,6 @@ ul {
   color: #333;
   position: relative;
 }
-
-/* .problema-item::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 90%;
-  height: 1px;
-  background-color: #ddd;
-  margin-left: 5%;
-} */
 
 .problema-item .v-img {
   position: absolute;

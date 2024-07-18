@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -90,6 +91,7 @@ export default {
         },
       ],
       checklistItens: "",
+      newManual: {},
     };
   },
   methods: {
@@ -98,21 +100,19 @@ export default {
     },
     validate() {
       if (this.$refs.form.validate()) {
-        const newMachine = {};
         if (this.setorSelecionado !== null || this.nomeMaquina !== null) {
+          this.newManual = {};
           this.setorSelecionado.forEach((setor) => {
-            newMachine[setor] = {};
-            newMachine[setor][this.nomeMaquina] = {};
-            newMachine[setor][this.nomeMaquina]["Itens a verificar"] = [];
+            this.newManual[setor] = {};
+            this.newManual[setor][this.nomeMaquina] = {};
+            this.newManual[setor][this.nomeMaquina]["Itens a verificar"] = [];
 
             for (let i = 0; i < this.problemas.length; i++) {
-              newMachine[setor][this.nomeMaquina][this.problemas.nome] = {};
-              console.log(i);
               let itensDefeito = this.problemas[i].defeitos.split("\n");
-              newMachine[setor][this.nomeMaquina][this.problemas[i].name] = [];
+              this.newManual[setor][this.nomeMaquina][this.problemas[i].name] = [];
               for (let j = 0; j < itensDefeito.length; j++) {
                 if (itensDefeito[j] !== "" || itensDefeito[j] !== undefined) {
-                  newMachine[setor][this.nomeMaquina][this.problemas[i].name].push(`${j + 1} - ${itensDefeito[j]}`);
+                  this.newManual[setor][this.nomeMaquina][this.problemas[i].name].push(`${j + 1} - ${itensDefeito[j]}`);
                 }
               }
             }
@@ -120,15 +120,24 @@ export default {
             const itensChecklistFilter = this.checklistItens.split("\n");
             for (let i = 0; i < itensChecklistFilter.length; i++) {
               if (itensChecklistFilter[i] !== "") {
-                newMachine[setor][this.nomeMaquina]["Itens a verificar"].push(`${i + 1} - ${itensChecklistFilter[i]}`);
+                this.newManual[setor][this.nomeMaquina]["Itens a verificar"].push(`${i + 1} - ${itensChecklistFilter[i]}`);
               }
             }
           });
-          // console.log(newMachine);
+          this.submit();
         }
       }
     },
-    submit() {},
+    submit() {
+      axios
+        .post("http://localhost:3000/cadastro-maquina", this.newManual)
+        .then((response) => {
+          console.log("Resposta do server:", response.data);
+        })
+        .catch((error) => {
+          console.error("Erro:", error);
+        });
+    },
     reset() {
       this.$refs.form.reset();
       this.problemas = [{ name: "", defeitos: "" }];

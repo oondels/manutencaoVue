@@ -6,6 +6,7 @@ const session = require("express-session");
 const http = require("http");
 const cors = require("cors");
 const { pool } = require("./database/config/config");
+const { criarCategoria, criarMaquina, criarProblema, criarSetor, relacaoSetorMaquina } = require("./models/index");
 
 const app = express();
 const port = 3000;
@@ -92,7 +93,7 @@ app.get("/api/manual_maqs", async (req, res) => {
       const setorNome = row.setor_nome;
       const maquinaNome = row.maquina_nome;
       const categoriaNome = row.categoria_nome;
-      const problemas = row.problemas;
+      const solucoes = row.problemas;
 
       if (!manualMaquinas[setorNome]) {
         manualMaquinas[setorNome] = {};
@@ -106,8 +107,10 @@ app.get("/api/manual_maqs", async (req, res) => {
         manualMaquinas[setorNome][maquinaNome][categoriaNome] = [];
       }
 
-      problemas.forEach((problema) => {
-        manualMaquinas[setorNome][maquinaNome][categoriaNome].push(problema.descricao);
+      solucoes.forEach((solucao) => {
+        if (solucao) {
+          manualMaquinas[setorNome][maquinaNome][categoriaNome].push(solucao.descricao);
+        }
       });
     });
 
@@ -115,6 +118,37 @@ app.get("/api/manual_maqs", async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar dados:", error);
     res.status(500).json({ error: "Erro ao buscar dados de manualmaquinas" });
+  }
+});
+
+app.post("/cadastro-maquina", async (req, res) => {
+  const newManual = req.body;
+  console.log(newManual);
+
+  try {
+    // for (const setorNome in newManual) {
+    //   const setor = await criarSetor(setorNome);
+
+    //   const maquinas = newManual[setorNome];
+    //   for (const maquinaNome in maquinas) {
+    //     const maquina = await criarMaquina(maquinaNome);
+    //     await relacaoSetorMaquina(setor.id, maquina.id);
+
+    //     const categorias = maquinas[maquinaNome];
+    //     for (const categoriaNome in categorias) {
+    //       const categoria = await criarCategoria(categoriaNome, maquina.id);
+
+    //       const problemas = categorias[categoriaNome];
+    //       for (const problemaNome of problemas) {
+    //         await criarProblema(problemaNome, categoria.id);
+    //       }
+    //     }
+    //   }
+    // }
+    return res.status(201).json({ message: "Máquina cadastrada com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao cadastrar os dados:", error);
+    res.status(500).json({ erro: `Error: ${error}` });
   }
 });
 
@@ -153,21 +187,6 @@ app.post("/login-token", async (req, res) => {
     res.redirect(`/manualmaquinas`);
   } catch (error) {
     console.error("Erro ao buscar Usuário:", error);
-  }
-});
-
-app.get("/cadastro-maquinas", async (req, res) => {
-  const userId = req.session.userId;
-
-  try {
-    const user = await User.findByPk(userId);
-
-    if (user.admin) {
-      return res.render("cadastro_maquinas");
-    }
-    return res.json({ error: "Você não tem acesso a essa página" });
-  } catch (error) {
-    res.json({ error: "Erro ao buscar usuário" });
   }
 });
 
