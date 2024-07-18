@@ -313,7 +313,7 @@ h1 {
 }
 
 .v-expansion-panel-text__wrapper {
-  padding: 10px;
+  padding: 10px !important;
 }
 
 .categoria ul li:hover {
@@ -415,7 +415,7 @@ ul {
   }
 
   .v-expansion-panel-text__wrapper {
-    padding: 0;
+    padding: 0 !important;
   }
   .categoria ul li {
     flex-direction: column;
