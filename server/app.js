@@ -123,32 +123,31 @@ app.get("/api/manual_maqs", async (req, res) => {
 
 app.post("/cadastro-maquina", async (req, res) => {
   const newManual = req.body;
-  console.log(newManual);
 
   try {
-    // for (const setorNome in newManual) {
-    //   const setor = await criarSetor(setorNome);
+    for (const setorNome in newManual) {
+      const setor = await criarSetor(setorNome);
 
-    //   const maquinas = newManual[setorNome];
-    //   for (const maquinaNome in maquinas) {
-    //     const maquina = await criarMaquina(maquinaNome);
-    //     await relacaoSetorMaquina(setor.id, maquina.id);
+      const maquinas = newManual[setorNome];
+      for (const maquinaNome in maquinas) {
+        const maquina = await criarMaquina(maquinaNome);
+        await relacaoSetorMaquina(setor.id, maquina.id);
 
-    //     const categorias = maquinas[maquinaNome];
-    //     for (const categoriaNome in categorias) {
-    //       const categoria = await criarCategoria(categoriaNome, maquina.id);
+        const categorias = maquinas[maquinaNome];
+        for (const categoriaNome in categorias) {
+          const categoria = await criarCategoria(categoriaNome, maquina.id);
 
-    //       const problemas = categorias[categoriaNome];
-    //       for (const problemaNome of problemas) {
-    //         await criarProblema(problemaNome, categoria.id);
-    //       }
-    //     }
-    //   }
-    // }
+          const problemas = categorias[categoriaNome];
+          for (const problemaNome of problemas) {
+            await criarProblema(problemaNome, categoria.id);
+          }
+        }
+      }
+    }
     return res.status(201).json({ message: "Máquina cadastrada com sucesso!" });
   } catch (error) {
     console.error("Erro ao cadastrar os dados:", error);
-    res.status(500).json({ erro: `Error: ${error}` });
+    return res.status(500).json({ erro: `Error: ${error}` });
   }
 });
 

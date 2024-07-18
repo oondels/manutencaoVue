@@ -312,6 +312,10 @@ h1 {
   min-width: 600px;
 }
 
+.v-expansion-panel-text__wrapper {
+  padding: 10px;
+}
+
 .categoria ul li:hover {
   transform: translateY(-5px);
 }
@@ -347,11 +351,85 @@ ul {
 
 .problema-item .v-img {
   position: absolute;
-  right: 40px;
+  right: 10px;
   width: 35px;
 }
 
 .v-expansion-panel {
   padding: 7px;
+}
+
+@media (max-width: 1200px) {
+  .select-lists {
+    flex-direction: column;
+  }
+
+  .select {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 20px;
+  }
+
+  .title h1 {
+    font-size: 28px;
+  }
+
+  .title .v-img {
+    width: 100px;
+  }
+
+  .pesquisa-btn {
+    max-width: 100%;
+  }
+
+  .categoria ul li {
+    min-width: auto;
+  }
+
+  .problemas-list li h4 {
+    font-size: 14px;
+    margin-right: 15px;
+  }
+
+  .problema-item .v-img {
+    position: absolute;
+    right: 10px;
+    width: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title h1 {
+    font-size: 24px;
+  }
+
+  .wrapper {
+    padding: 0;
+  }
+  .title .v-img {
+    width: 80px;
+  }
+
+  .v-expansion-panel-text__wrapper {
+    padding: 0;
+  }
+  .categoria ul li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .problema-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  body,
+  html {
+    padding: 10px;
+  }
 }
 </style>

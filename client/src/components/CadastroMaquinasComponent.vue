@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="mx-auto">
+  <v-sheet class="mx-auto" width="100%" max-width="900">
     <h2>TPM - Cadastro de Máquinas</h2>
     <v-form ref="form">
       <p>Nome da Máquina</p>
@@ -11,6 +11,7 @@
         :rules="campoRegra"
         label="Nome da Máquina"
         required
+        outlined
       ></v-text-field>
       <p>Selecione os Setores que a Máquina trabalha</p>
       <v-select
@@ -23,6 +24,7 @@
         multiple
         required
         clearable
+        outlined
       ></v-select>
 
       <div v-for="(problema, index) in problemas" :key="index" class="cadastro-problema mb-3">
@@ -35,6 +37,7 @@
           label="Nome do Defeito"
           variant="outlined"
           required
+          outlined
         ></v-text-field>
 
         <p>Soluções para o Defeito {{ index }}</p>
@@ -43,12 +46,13 @@
           v-model="problema.defeitos"
           label="Defeitos"
           row-height="30"
-          rows="10"
+          rows="5"
           variant="outlined"
           :rules="campoRegra"
           auto-grow
           shaped
           required
+          outlined
         ></v-textarea>
       </div>
       <v-btn class="btn add" @click="addProblema">Adicionar Defeito</v-btn>
@@ -60,11 +64,12 @@
         label="Itens para Verificar"
         row-height="30"
         :rules="campoRegra"
-        rows="10"
+        rows="5"
         variant="outlined"
         auto-grow
         shaped
         required
+        outlined
       ></v-textarea>
       <div class="d-flex flex-column mt-4">
         <v-btn class="btn cadastro" block @click="validate">Cadastrar</v-btn>
@@ -83,7 +88,6 @@ export default {
       setorSelecionado: null,
       setores: ["Montagem", "Costura", "Corte Automático", "Serigrafia", "Bordado", "Apoio", "Lavagem", "Pré Solado"],
       problemas: [{ name: "", defeitos: "" }],
-      nameRules: [(v) => !!v || "Este campo é obrigatório", (v) => (v && v.length <= 50) || "Máximo 50 caracteres"],
       campoRegra: [
         (value) => {
           if (value) return true;
@@ -133,6 +137,8 @@ export default {
         .post("http://localhost:3000/cadastro-maquina", this.newManual)
         .then((response) => {
           console.log("Resposta do server:", response.data);
+          alert("Máquina cadastrada com Sucesso!");
+          this.reset();
         })
         .catch((error) => {
           console.error("Erro:", error);
@@ -146,35 +152,25 @@ export default {
 };
 </script>
 
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-* {
-  font-family: "Poppins", sans-serif;
-}
-
-.mx-auto h2 {
-  color: #0056b3;
-  font-size: 32px;
-  background: transparent;
-  padding: 20px 0;
-}
-
+<style scoped>
 .mx-auto {
-  background: #ffffff !important;
-  display: flex !important;
-  flex-direction: column !important;
+  padding: 20px;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .input {
-  width: 500px;
+  width: 100%;
+  max-width: 600px;
   color: #004ea1;
 }
 
 .btn {
-  width: 230px !important;
-  margin-bottom: 15px !important;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 15px;
 }
 
 .cadastro {
@@ -189,8 +185,11 @@ export default {
 
 .reset {
   background: #e68585 !important;
-  width: 10px !important;
   color: #fff !important;
+}
+
+.cadastro-problema {
+  margin-bottom: 20px;
 }
 
 p {
