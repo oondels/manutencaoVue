@@ -39,12 +39,42 @@
           required
           outlined
         ></v-text-field>
+        <div class="radio-buttons-container">
+          <div class="radio-button">
+            <input
+              name="radio-group"
+              id="radio2"
+              class="radio-button__input"
+              value="Mecânico"
+              v-model="problema.tipo"
+              type="radio"
+            />
+            <label for="radio2" class="radio-button__label">
+              <span class="radio-button__custom"></span>
+              Mecânico
+            </label>
+          </div>
+          <div class="radio-button">
+            <input
+              name="radio-group"
+              id="radio1"
+              class="radio-button__input"
+              value="Operacional"
+              v-model="problema.tipo"
+              type="radio"
+            />
+            <label for="radio1" class="radio-button__label">
+              <span class="radio-button__custom"></span>
+              Operacional
+            </label>
+          </div>
+        </div>
 
-        <p>Soluções para o Defeito {{ index }}</p>
+        <p>Soluções para o Defeito {{ index + 1 }}</p>
         <v-textarea
           class="input"
           v-model="problema.defeitos"
-          label="Defeitos"
+          label="Soluções"
           row-height="30"
           rows="5"
           variant="outlined"
@@ -87,7 +117,7 @@ export default {
       nomeMaquina: null,
       setorSelecionado: null,
       setores: ["Montagem", "Costura", "Corte Automático", "Serigrafia", "Bordado", "Apoio", "Lavagem", "Pré Solado"],
-      problemas: [{ name: "", defeitos: "" }],
+      problemas: [{ name: "", defeitos: "", tipo: "" }],
       campoRegra: [
         (value) => {
           if (value) return true;
@@ -100,9 +130,10 @@ export default {
   },
   methods: {
     addProblema() {
-      this.problemas.push({ name: "", defeitos: "" });
+      this.problemas.push({ name: "", defeitos: "", tipo: "" });
     },
     validate() {
+      console.log(this.problemas);
       if (this.$refs.form.validate()) {
         if (this.setorSelecionado !== null || this.nomeMaquina !== null) {
           this.newManual = {};
@@ -116,7 +147,9 @@ export default {
               this.newManual[setor][this.nomeMaquina][this.problemas[i].name] = [];
               for (let j = 0; j < itensDefeito.length; j++) {
                 if (itensDefeito[j] !== "" || itensDefeito[j] !== undefined) {
-                  this.newManual[setor][this.nomeMaquina][this.problemas[i].name].push(`${j + 1} - ${itensDefeito[j]}`);
+                  this.newManual[setor][this.nomeMaquina][this.problemas[i].name].push(
+                    `${j + 1} - ${itensDefeito[j]} (${this.problemas[i].tipo})`
+                  );
                 }
               }
             }
@@ -196,5 +229,63 @@ p {
   margin-bottom: 5px;
   color: #007bff;
   text-align: left;
+}
+
+.radio-buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.radio-button {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.radio-button__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-button__label {
+  display: inline-block;
+  padding-left: 30px;
+  margin-bottom: 10px;
+  position: relative;
+  font-size: 16px;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.radio-button__custom {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #555;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.radio-button__input:checked + .radio-button__label .radio-button__custom {
+  transform: translateY(-50%) scale(0.9);
+  border: 5px solid #4c8bf5;
+  color: #4c8bf5;
+}
+
+.radio-button__input:checked + .radio-button__label {
+  color: #4c8bf5;
+}
+
+.radio-button__label:hover .radio-button__custom {
+  transform: translateY(-50%) scale(1.2);
+  border-color: #4c8bf5;
+  box-shadow: 0 0 10px #4c8bf580;
 }
 </style>
