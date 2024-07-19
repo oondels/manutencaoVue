@@ -71,36 +71,43 @@
         </div>
 
         <p>Soluções para o Defeito {{ index + 1 }}</p>
+        <div class="textarea-container">
+          <v-textarea
+            class="input custom-textarea"
+            v-model="problema.defeitos"
+            label="Soluções"
+            row-height="30"
+            rows="5"
+            variant="outlined"
+            :rules="campoRegra"
+            auto-grow
+            shaped
+            required
+            outlined
+          ></v-textarea>
+          <div class="tooltip">Separe os items com espaço!</div>
+        </div>
+      </div>
+      <v-btn class="btn add" @click="addProblema">Adicionar Defeito</v-btn>
+
+      <p>Checklist</p>
+      <div class="textarea-container">
         <v-textarea
-          class="input"
-          v-model="problema.defeitos"
-          label="Soluções"
+          class="input custom-textarea"
+          v-model="checklistItens"
+          label="Itens para Verificar"
           row-height="30"
+          :rules="campoRegra"
           rows="5"
           variant="outlined"
-          :rules="campoRegra"
           auto-grow
           shaped
           required
           outlined
         ></v-textarea>
+        <div class="tooltip">Separe os items com espaço!</div>
       </div>
-      <v-btn class="btn add" @click="addProblema">Adicionar Defeito</v-btn>
 
-      <p>Checklist</p>
-      <v-textarea
-        class="input"
-        v-model="checklistItens"
-        label="Itens para Verificar"
-        row-height="30"
-        :rules="campoRegra"
-        rows="5"
-        variant="outlined"
-        auto-grow
-        shaped
-        required
-        outlined
-      ></v-textarea>
       <div class="d-flex flex-column mt-4">
         <v-btn class="btn cadastro" block @click="validate">Cadastrar</v-btn>
         <v-btn class="btn reset" block @click="reset">Resetar Cadastro</v-btn>
@@ -200,15 +207,51 @@ export default {
   align-items: center;
 }
 
+/* Form */
 .input {
   width: 100%;
   max-width: 600px;
   color: #004ea1;
 }
 
+.textarea-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.custom-textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 250px;
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.textarea-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 .btn {
   width: 100%;
-  max-width: 300px;
+  max-width: 200px;
   margin-bottom: 15px;
 }
 

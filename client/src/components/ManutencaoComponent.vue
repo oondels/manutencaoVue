@@ -9,11 +9,25 @@
         <div class="select-lists">
           <div class="setor-select select">
             <p>Selecione um Setor</p>
-            <v-select clearable class="select" label="Setores" :items="listaSetores" v-model="setor"></v-select>
+            <v-select
+              :list-props="{ maxWidth: '250px' }"
+              clearable
+              class="select"
+              label="Setores"
+              :items="listaSetores"
+              v-model="setor"
+            ></v-select>
           </div>
           <div class="maquina-select select">
             <p>Selecione uma Máquina</p>
-            <v-select clearable class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
+            <v-select
+              :list-props="{ maxWidth: '250px', maxHeight: '700px' }"
+              clearable
+              class="select"
+              label="Maquinas"
+              :items="listaMaquinas"
+              v-model="maquina"
+            ></v-select>
           </div>
         </div>
 
