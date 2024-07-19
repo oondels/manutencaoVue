@@ -13,14 +13,15 @@
           </div>
           <div class="maquina-select select">
             <p>Selecione uma Máquina</p>
-            <v-select class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
+            <v-select clearable class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
           </div>
         </div>
-        <v-btn class="pesquisa-btn" @click="displayMaquinas">Pesquisar</v-btn>
+        <!-- <v-btn class="pesquisa-btn" @click="updatePesquisaMaquinas">Pesquisar</v-btn> -->
         <div class="escolher-categoria">
           <p>Deseja aplicar um filtro?</p>
-          <v-btn class="categoria-mecanico" @click="updateDisplayMaquinas('Mecânico')">Mecânico</v-btn>
-          <v-btn class="categoria-operacional" @click="updateDisplayMaquinas('Operacional')">Operacional</v-btn>
+          <v-btn class="categoria-mecanico" @click="filtroDefeitos('Mecânico')">Mecânico</v-btn>
+          <v-btn class="categoria-operacional" @click="filtroDefeitos('Operacional')">Operacional</v-btn>
+          <v-btn color="yellow" @click="filtroDefeitos()">Reset</v-btn>
         </div>
 
         <div class="cadastro-painel">
@@ -34,7 +35,7 @@
         </div>
       </div>
       <div class="main">
-        <diWv class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
+        <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
           <h1>{{ setorNome }}</h1>
 
           <div class="maquinas-list" v-if="maquinas">
@@ -65,7 +66,7 @@
             </div>
           </div>
           <div v-else><h2>Sem máquinas no setor!</h2></div>
-        </diWv>
+        </div>
       </div>
     </div>
   </div>
@@ -84,33 +85,36 @@ export default {
   },
   data() {
     return {
-      setor: "",
-      maquina: "",
+      setor: null,
+      maquina: null,
       listaSetores: [],
       listaMaquinas: [],
       maquinasObject: {},
       maquinasObjectOriginal: {},
-      name: "",
-      select: null,
-      items: ["Item 1", "Item 2", "Item 3", "Item 4"],
+      filtroTipo: null,
       checkbox: false,
     };
   },
   mounted() {
-    this.displayMaquinas();
+    this.queryMaquinas();
   },
   watch: {
     setor(newSetor) {
+      this.maquina = null;
       this.updateListaMaquinas(newSetor);
+      this.updatePesquisaMaquinas(newSetor);
+      if (!newSetor) {
+        this.maquinasObject = JSON.parse(JSON.stringify(this.maquinasObjectOriginal));
+      }
+    },
+    maquina(newMaquina) {
+      this.updatePesquisaMaquinas(newMaquina);
     },
   },
   methods: {
-    displayMaquinas() {
-      const params = {};
-      if (this.setor) params.setor = this.setor;
-      if (this.maquina) params.maquina = this.maquina;
+    queryMaquinas() {
       axios
-        .get("http://localhost:3000/api/manual_maqs", { params })
+        .get("http://localhost:3000/api/manual_maqs")
         .then((response) => {
           this.maquinasObject = response.data;
           this.maquinasObjectOriginal = JSON.parse(JSON.stringify(this.maquinasObject));
@@ -125,36 +129,43 @@ export default {
         .catch((error) => {
           console.error("Error:", error);
         });
-      this.setor = "";
-      this.maquina = "";
+      this.setor = null;
+      this.maquina = null;
     },
     updateListaMaquinas(setor) {
       this.listaMaquinas = [];
-      if (this.maquinasObject && this.maquinasObject[setor]) {
-        this.listaMaquinas = Object.keys(this.maquinasObject[setor]);
-      } else {
-        this.listaMaquinas = [];
-      }
+      this.listaMaquinas = this.maquinasObjectOriginal[setor] ? Object.keys(this.maquinasObjectOriginal[setor]) : [];
     },
-    updateDisplayMaquinas(selecao) {
+    updatePesquisaMaquinas() {
       this.maquinasObject = JSON.parse(JSON.stringify(this.maquinasObjectOriginal));
 
-      const newMaquinasObject = {};
-      for (const setor in this.maquinasObject) {
-        newMaquinasObject[setor] = {};
-        for (const maquina in this.maquinasObject[setor]) {
-          newMaquinasObject[setor][maquina] = {};
-          for (const categoria in this.maquinasObject[setor][maquina]) {
-            newMaquinasObject[setor][maquina][categoria] = [];
-            this.maquinasObject[setor][maquina][categoria].forEach((solucao) => {
-              if (solucao.includes(selecao)) {
-                newMaquinasObject[setor][maquina][categoria].push(solucao);
+      const newMaquinasObjectPesquisa = {};
+      for (const setorNome in this.maquinasObject) {
+        if (!this.setor || this.setor === setorNome) {
+          newMaquinasObjectPesquisa[setorNome] = {};
+          for (const maquinaNome in this.maquinasObject[setorNome]) {
+            if (!this.maquina || this.maquina === maquinaNome) {
+              newMaquinasObjectPesquisa[setorNome][maquinaNome] = {};
+              for (const categoria in this.maquinasObject[setorNome][maquinaNome]) {
+                newMaquinasObjectPesquisa[setorNome][maquinaNome][categoria] = [
+                  ...this.maquinasObject[setorNome][maquinaNome][categoria],
+                ];
+                if (this.filtroTipo) {
+                  newMaquinasObjectPesquisa[setorNome][maquinaNome][categoria] = newMaquinasObjectPesquisa[setorNome][
+                    maquinaNome
+                  ][categoria].filter((defeito) => defeito.includes(this.filtroTipo));
+                }
               }
-            });
+            }
           }
         }
       }
-      this.maquinasObject = newMaquinasObject;
+
+      this.maquinasObject = newMaquinasObjectPesquisa;
+    },
+    filtroDefeitos(tipo) {
+      this.filtroTipo = tipo;
+      this.updatePesquisaMaquinas();
     },
     getIcon(problema) {
       if (problema.includes("Mecânico")) {
