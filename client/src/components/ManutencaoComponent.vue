@@ -16,13 +16,6 @@
             <v-select clearable class="select" label="Maquinas" :items="listaMaquinas" v-model="maquina"></v-select>
           </div>
         </div>
-        <!-- <v-btn class="pesquisa-btn" @click="updatePesquisaMaquinas">Pesquisar</v-btn> -->
-        <div class="escolher-categoria">
-          <p>Deseja aplicar um filtro?</p>
-          <v-btn class="categoria-mecanico" @click="filtroDefeitos('Mecânico')">Mecânico</v-btn>
-          <v-btn class="categoria-operacional" @click="filtroDefeitos('Operacional')">Operacional</v-btn>
-          <v-btn color="yellow" @click="filtroDefeitos()">Reset</v-btn>
-        </div>
 
         <div class="cadastro-painel">
           <v-expansion-panels class="expandir-button">
@@ -34,7 +27,14 @@
           </v-expansion-panels>
         </div>
       </div>
+
       <div class="main">
+        <div class="escolher-categoria">
+          <p>Deseja aplicar um filtro?</p>
+          <v-btn class="categoria-mecanico" @click="filtroDefeitos('Mecânico')">Mecânico</v-btn>
+          <v-btn class="categoria-operacional" @click="filtroDefeitos('Operacional')">Operacional</v-btn>
+          <v-btn color="yellow" @click="filtroDefeitos()">Reset</v-btn>
+        </div>
         <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
           <h1>{{ setorNome }}</h1>
 
@@ -49,13 +49,23 @@
                       <v-expansion-panels>
                         <v-expansion-panel class="toggle-button" :title="categoriaNome">
                           <v-expansion-panel-text>
-                            <ul class="problemas-list">
-                              <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
-                                <h4>{{ problema }}</h4>
-                                <v-img :src="getIcon(problema)"></v-img>
-                                <span style="display: none" class="text-message">Span</span>
-                              </li>
-                            </ul>
+                            <div v-if="problemas.length > 0">
+                              <ul class="problemas-list">
+                                <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
+                                  <h4>{{ problema }}</h4>
+                                  <v-img :src="getIcon(problema)"></v-img>
+                                </li>
+                              </ul>
+                            </div>
+                            <div v-else>
+                              <ul class="problemas-list">
+                                <li class="problema-item">
+                                  <h4>
+                                    Sem Informações Cadastradas para: <span style="color: blue">{{ this.filtroTipo }}</span>
+                                  </h4>
+                                </li>
+                              </ul>
+                            </div>
                           </v-expansion-panel-text>
                         </v-expansion-panel>
                       </v-expansion-panels>
