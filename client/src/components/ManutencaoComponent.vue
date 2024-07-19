@@ -31,9 +31,15 @@
       <div class="main">
         <div class="escolher-categoria">
           <p>Deseja aplicar um filtro?</p>
-          <v-btn class="categoria-mecanico" @click="filtroDefeitos('Mecânico')">Mecânico</v-btn>
-          <v-btn class="categoria-operacional" @click="filtroDefeitos('Operacional')">Operacional</v-btn>
-          <v-btn color="yellow" @click="filtroDefeitos()">Reset</v-btn>
+          <v-btn :class="{ active: filtroTipo === 'Mecânico' }" class="categoria-mecanico" @click="filtroDefeitos('Mecânico')"
+            >Mecânico</v-btn
+          >
+          <v-btn
+            :class="{ active: filtroTipo === 'Operacional' }"
+            class="categoria-operacional"
+            @click="filtroDefeitos('Operacional')"
+            >Operacional</v-btn
+          >
         </div>
         <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
           <h1>{{ setorNome }}</h1>
@@ -103,6 +109,7 @@ export default {
       maquinasObjectOriginal: {},
       filtroTipo: null,
       checkbox: false,
+      model: null,
     };
   },
   mounted() {
@@ -174,7 +181,11 @@ export default {
       this.maquinasObject = newMaquinasObjectPesquisa;
     },
     filtroDefeitos(tipo) {
-      this.filtroTipo = tipo;
+      if (this.filtroTipo === tipo) {
+        this.filtroTipo = null;
+      } else {
+        this.filtroTipo = tipo;
+      }
       this.updatePesquisaMaquinas();
     },
     getIcon(problema) {
@@ -196,6 +207,17 @@ export default {
 }
 .v-expansion-panel-text__wrapper {
   border-radius: 10px;
+}
+
+.categoria-mecanico,
+.categoria-operacional {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.categoria-mecanico.active,
+.categoria-operacional.active {
+  background-color: #ffeb3b !important;
+  color: #000; /* Cor do texto para botão ativo */
 }
 .select-lists {
   display: flex;
