@@ -124,7 +124,7 @@ export default {
           return "Este Campo é Obrigatório!";
         },
       ],
-      checklistItens: "",
+      checklistItens: null,
       newManual: {},
     };
   },
@@ -133,9 +133,13 @@ export default {
       this.problemas.push({ name: "", defeitos: "", tipo: "" });
     },
     validate() {
-      console.log(this.problemas);
       if (this.$refs.form.validate()) {
-        if (this.setorSelecionado !== null || this.nomeMaquina !== null) {
+        if (
+          this.setorSelecionado !== null ||
+          this.nomeMaquina !== null ||
+          this.problemas.length !== 0 ||
+          this.checklistItens !== null
+        ) {
           this.newManual = {};
           this.setorSelecionado.forEach((setor) => {
             this.newManual[setor] = {};
