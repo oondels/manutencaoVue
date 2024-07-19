@@ -19,8 +19,8 @@
         <v-btn class="pesquisa-btn" @click="displayMaquinas">Pesquisar</v-btn>
         <div class="escolher-categoria">
           <p>Deseja aplicar um filtro?</p>
-          <v-btn @click="updateDisplayMaquinas('Mecânico')">Mecânico</v-btn>
-          <v-btn @click="updateDisplayMaquinas('Operacional')">Operacional</v-btn>
+          <v-btn class="categoria-mecanico" @click="updateDisplayMaquinas('Mecânico')">Mecânico</v-btn>
+          <v-btn class="categoria-operacional" @click="updateDisplayMaquinas('Operacional')">Operacional</v-btn>
         </div>
 
         <div class="cadastro-painel">
@@ -86,10 +86,11 @@ export default {
     return {
       setor: "",
       maquina: "",
+      listaSetores: [],
+      listaMaquinas: [],
       maquinasObject: {},
       maquinasObjectOriginal: {},
       name: "",
-      nameRules: [(v) => !!v || "Name is required", (v) => (v && v.length <= 10) || "Name must be less than 10 characters"],
       select: null,
       items: ["Item 1", "Item 2", "Item 3", "Item 4"],
       checkbox: false,
@@ -201,6 +202,23 @@ export default {
 .select {
   width: 300px;
   padding: 0 10px;
+}
+
+.escolher-categoria {
+  margin-bottom: 20px;
+  padding: 10px;
+  /* border: 1px solid #add1f8;
+  border-radius: 20px; */
+}
+
+.categoria-mecanico {
+  margin: 0 10px;
+  background-color: #add1f8 !important;
+}
+
+.categoria-operacional {
+  margin: 0 10px;
+  background-color: rgb(247, 204, 204) !important;
 }
 
 .select-lists {

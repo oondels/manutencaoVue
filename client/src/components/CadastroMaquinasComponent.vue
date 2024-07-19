@@ -42,28 +42,28 @@
         <div class="radio-buttons-container">
           <div class="radio-button">
             <input
-              name="radio-group"
-              id="radio2"
+              :name="'radio-group-' + index"
+              :id="'radio-mecanico-' + index"
               class="radio-button__input"
               value="Mecânico"
               v-model="problema.tipo"
               type="radio"
             />
-            <label for="radio2" class="radio-button__label">
+            <label :for="'radio-mecanico-' + index" class="radio-button__label">
               <span class="radio-button__custom"></span>
               Mecânico
             </label>
           </div>
           <div class="radio-button">
             <input
-              name="radio-group"
-              id="radio1"
+              :name="'radio-group-' + index"
+              :id="'radio-operacional-' + index"
               class="radio-button__input"
               value="Operacional"
               v-model="problema.tipo"
               type="radio"
             />
-            <label for="radio1" class="radio-button__label">
+            <label :for="'radio-operacional-' + index" class="radio-button__label">
               <span class="radio-button__custom"></span>
               Operacional
             </label>
@@ -117,7 +117,7 @@ export default {
       nomeMaquina: null,
       setorSelecionado: null,
       setores: ["Montagem", "Costura", "Corte Automático", "Serigrafia", "Bordado", "Apoio", "Lavagem", "Pré Solado"],
-      problemas: [{ name: "", defeitos: "", tipo: "" }],
+      problemas: [{ name: null, defeitos: null, tipo: null }],
       campoRegra: [
         (value) => {
           if (value) return true;
@@ -130,15 +130,16 @@ export default {
   },
   methods: {
     addProblema() {
-      this.problemas.push({ name: "", defeitos: "", tipo: "" });
+      this.problemas.push({ name: null, defeitos: null, tipo: null });
     },
     validate() {
       if (this.$refs.form.validate()) {
         if (
-          this.setorSelecionado !== null ||
-          this.nomeMaquina !== null ||
-          this.problemas.length !== 0 ||
-          this.checklistItens !== null
+          this.setorSelecionado !== null &&
+          this.setorSelecionado.length > 0 &&
+          this.nomeMaquina !== null &&
+          this.checklistItens !== null &&
+          this.problemas.length > 0
         ) {
           this.newManual = {};
           this.setorSelecionado.forEach((setor) => {
@@ -166,6 +167,7 @@ export default {
             }
           });
           this.submit();
+          // console.log(this.newManual);
         }
       }
     },
