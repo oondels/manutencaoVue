@@ -125,6 +125,7 @@ export default {
       setorSelecionado: null,
       setores: ["Montagem", "Costura", "Corte Automático", "Serigrafia", "Bordado", "Apoio", "Lavagem", "Pré Solado"],
       problemas: [{ name: null, defeitos: null, tipo: null }],
+      csrfToken: "",
       campoRegra: [
         (value) => {
           if (value) return true;
@@ -135,9 +136,23 @@ export default {
       newManual: {},
     };
   },
+  created() {
+    this.getCsrfToken();
+  },
   methods: {
     addProblema() {
       this.problemas.push({ name: null, defeitos: null, tipo: null });
+    },
+    async getCsrfToken() {
+      try {
+        const response = await axios.get("http://localhost:3000/csrf-token");
+
+        this.csrfToken = response.data.csrfToken;
+
+        axios.defaults.headers.common["X-CSRF-Token"] = this.csrfToken;
+      } catch (error) {
+        console.error("Erro ao obter o token CSRF:", error);
+      }
     },
     validate() {
       if (this.$refs.form.validate()) {
@@ -156,16 +171,15 @@ export default {
 
             for (let i = 0; i < this.problemas.length; i++) {
               let itensDefeito = this.problemas[i].defeitos.split("\n");
-              this.newManual[setor][this.nomeMaquina][this.problemas[i].name] = [];
+              this.newManual[setor][this.nomeMaquina][`Problema ${i + 1} - ${this.problemas[i].name}`] = [];
               for (let j = 0; j < itensDefeito.length; j++) {
                 if (itensDefeito[j] !== "" || itensDefeito[j] !== undefined) {
-                  this.newManual[setor][this.nomeMaquina][this.problemas[i].name].push(
+                  this.newManual[setor][this.nomeMaquina][`Problema ${i + 1} - ${this.problemas[i].name}`].push(
                     `${j + 1} - ${itensDefeito[j]} (${this.problemas[i].tipo})`
                   );
                 }
               }
             }
-
             const itensChecklistFilter = this.checklistItens.split("\n");
             for (let i = 0; i < itensChecklistFilter.length; i++) {
               if (itensChecklistFilter[i] !== "") {
@@ -173,8 +187,8 @@ export default {
               }
             }
           });
-          this.submit();
-          // console.log(this.newManual);
+          console.log(this.newManual);
+          // this.submit();
         }
       }
     },

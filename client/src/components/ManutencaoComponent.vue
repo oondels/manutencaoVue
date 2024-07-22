@@ -10,7 +10,8 @@
           <div class="setor-select select">
             <p>Selecione um Setor</p>
             <v-select
-              :list-props="{ maxWidth: '250px' }"
+              color="blue"
+              :list-props="{ maxWidth: '300px' }"
               clearable
               class="select"
               label="Setores"
@@ -21,7 +22,8 @@
           <div class="maquina-select select">
             <p>Selecione uma Máquina</p>
             <v-select
-              :list-props="{ maxWidth: '250px', maxHeight: '700px' }"
+              color="blue"
+              :list-props="{ maxWidth: '300px' }"
               clearable
               class="select"
               label="Maquinas"
