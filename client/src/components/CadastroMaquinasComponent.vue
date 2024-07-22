@@ -42,28 +42,28 @@
         <div class="radio-buttons-container">
           <div class="radio-button">
             <input
-              name="radio-group"
-              id="radio2"
+              :name="'radio-group-' + index"
+              :id="'radio-mecanico-' + index"
               class="radio-button__input"
               value="Mecânico"
               v-model="problema.tipo"
               type="radio"
             />
-            <label for="radio2" class="radio-button__label">
+            <label :for="'radio-mecanico-' + index" class="radio-button__label">
               <span class="radio-button__custom"></span>
               Mecânico
             </label>
           </div>
           <div class="radio-button">
             <input
-              name="radio-group"
-              id="radio1"
+              :name="'radio-group-' + index"
+              :id="'radio-operacional-' + index"
               class="radio-button__input"
               value="Operacional"
               v-model="problema.tipo"
               type="radio"
             />
-            <label for="radio1" class="radio-button__label">
+            <label :for="'radio-operacional-' + index" class="radio-button__label">
               <span class="radio-button__custom"></span>
               Operacional
             </label>
@@ -71,36 +71,43 @@
         </div>
 
         <p>Soluções para o Defeito {{ index + 1 }}</p>
+        <div class="textarea-container">
+          <v-textarea
+            class="input custom-textarea"
+            v-model="problema.defeitos"
+            label="Soluções"
+            row-height="30"
+            rows="5"
+            variant="outlined"
+            :rules="campoRegra"
+            auto-grow
+            shaped
+            required
+            outlined
+          ></v-textarea>
+          <div class="tooltip">Separe os items com espaço!</div>
+        </div>
+      </div>
+      <v-btn class="btn add" @click="addProblema">Adicionar Defeito</v-btn>
+
+      <p>Checklist</p>
+      <div class="textarea-container">
         <v-textarea
-          class="input"
-          v-model="problema.defeitos"
-          label="Soluções"
+          class="input custom-textarea"
+          v-model="checklistItens"
+          label="Itens para Verificar"
           row-height="30"
+          :rules="campoRegra"
           rows="5"
           variant="outlined"
-          :rules="campoRegra"
           auto-grow
           shaped
           required
           outlined
         ></v-textarea>
+        <div class="tooltip">Separe os items com espaço!</div>
       </div>
-      <v-btn class="btn add" @click="addProblema">Adicionar Defeito</v-btn>
 
-      <p>Checklist</p>
-      <v-textarea
-        class="input"
-        v-model="checklistItens"
-        label="Itens para Verificar"
-        row-height="30"
-        :rules="campoRegra"
-        rows="5"
-        variant="outlined"
-        auto-grow
-        shaped
-        required
-        outlined
-      ></v-textarea>
       <div class="d-flex flex-column mt-4">
         <v-btn class="btn cadastro" block @click="validate">Cadastrar</v-btn>
         <v-btn class="btn reset" block @click="reset">Resetar Cadastro</v-btn>
@@ -117,7 +124,8 @@ export default {
       nomeMaquina: null,
       setorSelecionado: null,
       setores: ["Montagem", "Costura", "Corte Automático", "Serigrafia", "Bordado", "Apoio", "Lavagem", "Pré Solado"],
-      problemas: [{ name: "", defeitos: "", tipo: "" }],
+      problemas: [{ name: null, defeitos: null, tipo: null }],
+      csrfToken: "",
       campoRegra: [
         (value) => {
           if (value) return true;
@@ -128,17 +136,32 @@ export default {
       newManual: {},
     };
   },
+  mounted() {
+    this.getCsrfToken();
+  },
   methods: {
     addProblema() {
-      this.problemas.push({ name: "", defeitos: "", tipo: "" });
+      this.problemas.push({ name: null, defeitos: null, tipo: null });
+    },
+    async getCsrfToken() {
+      try {
+        const response = await axios.get("http://localhost:3000/csrf-token", { withCredentials: true });
+
+        this.csrfToken = response.data.csrfToken;
+
+        axios.defaults.headers.common["X-CSRF-Token"] = this.csrfToken;
+      } catch (error) {
+        console.error("Erro ao obter o token CSRF:", error);
+      }
     },
     validate() {
       if (this.$refs.form.validate()) {
         if (
-          this.setorSelecionado !== null ||
-          this.nomeMaquina !== null ||
-          this.problemas.length !== 0 ||
-          this.checklistItens !== null
+          this.setorSelecionado !== null &&
+          this.setorSelecionado.length > 0 &&
+          this.nomeMaquina !== null &&
+          this.checklistItens !== null &&
+          this.problemas.length > 0
         ) {
           this.newManual = {};
           this.setorSelecionado.forEach((setor) => {
@@ -148,16 +171,15 @@ export default {
 
             for (let i = 0; i < this.problemas.length; i++) {
               let itensDefeito = this.problemas[i].defeitos.split("\n");
-              this.newManual[setor][this.nomeMaquina][this.problemas[i].name] = [];
+              this.newManual[setor][this.nomeMaquina][`Defeito ${i + 1} - ${this.problemas[i].name}`] = [];
               for (let j = 0; j < itensDefeito.length; j++) {
                 if (itensDefeito[j] !== "" || itensDefeito[j] !== undefined) {
-                  this.newManual[setor][this.nomeMaquina][this.problemas[i].name].push(
+                  this.newManual[setor][this.nomeMaquina][`Defeito ${i + 1} - ${this.problemas[i].name}`].push(
                     `${j + 1} - ${itensDefeito[j]} (${this.problemas[i].tipo})`
                   );
                 }
               }
             }
-
             const itensChecklistFilter = this.checklistItens.split("\n");
             for (let i = 0; i < itensChecklistFilter.length; i++) {
               if (itensChecklistFilter[i] !== "") {
@@ -171,7 +193,12 @@ export default {
     },
     submit() {
       axios
-        .post("http://localhost:3000/cadastro-maquina", this.newManual)
+        .post("http://localhost:3000/cadastro-maquina", this.newManual, {
+          headers: {
+            "X-CSRF-Token": this.csrfToken,
+          },
+          withCredentials: true,
+        })
         .then((response) => {
           console.log("Resposta do server:", response.data);
           alert("Máquina cadastrada com Sucesso!");
@@ -198,15 +225,51 @@ export default {
   align-items: center;
 }
 
+/* Form */
 .input {
   width: 100%;
   max-width: 600px;
   color: #004ea1;
 }
 
+.textarea-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.custom-textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 250px;
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.textarea-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 .btn {
   width: 100%;
-  max-width: 300px;
+  max-width: 200px;
   margin-bottom: 15px;
 }
 
