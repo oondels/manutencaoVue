@@ -26,8 +26,8 @@
       </div>
     </div>
 
-    <div v-for="(problema, index) in problemas" :key="index" class="border p-2 rounded mb-2">
-      <p>Defeito {{ index + 1 }}</p>
+    <div v-for="(problema, index) in problemas" :key="index" class="border pl-4 pr-4 rounded mb-2">
+      <p class="pt-3 pb-3">Defeito {{ index + 1 }}</p>
       <v-text-field
         class="input"
         v-model="problema.name"
@@ -39,7 +39,8 @@
 
       <div v-for="(category, cindex) in categories" :key="cindex">
         <div v-if="category.id !== 'checklist'">
-          <h5>{{ category.label }}</h5>
+          <h4 class="pb-2">{{ category.label }}</h4>
+
           <div col="12">
             <v-text-field
               variant="outlined"
@@ -73,7 +74,7 @@
 
     <div v-for="(category, cindex) in categories" :key="cindex">
       <div v-if="category.id === 'checklist'">
-        <h5>{{ category.label }}</h5>
+        <h4>{{ category.label }}</h4>
         <div col="12">
           <v-text-field
             variant="outlined"
@@ -98,7 +99,7 @@
 
     <div class="col-12">
       <v-btn class="me-1" color="success" @click="validate">Cadastrar</v-btn>
-      <v-btn color="danger" @click="reset">Resetar Cadastro</v-btn>
+      <v-btn color="red" @click="reset">Resetar Cadastro</v-btn>
     </div>
   </v-form>
 </template>

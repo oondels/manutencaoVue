@@ -1,9 +1,9 @@
 <template>
-  <h1>TPM - Manual de Máquinas</h1>
-  <div class="container">
+  <div class="container my-5 p-4 bg-light rounded shadow-sm">
+    <h1 class="text-center mb-4 text-primary">TPM - Manual de Máquinas</h1>
     <div class="mb-3">
       <v-expansion-panels>
-        <v-expansion-panel color="success" title="Cadastrar Máquina">
+        <v-expansion-panel title="Cadastrar Máquina">
           <v-expansion-panel-text>
             <cadastro-defeitos />
           </v-expansion-panel-text>
@@ -11,74 +11,77 @@
       </v-expansion-panels>
     </div>
 
-    <div class="col-12 row m-0 mb-3">
-      <div class="col-6 p-0 pe-1">
+    <div class="row mb-4">
+      <!-- Setores Select -->
+      <div class="col-md-6 mb-3 mb-md-0">
         <v-select
           clearable
           variant="outlined"
           density="compact"
-          class="select"
+          class="form-select custom-select"
           label="Setores"
           :items="listaSetores"
           v-model="setor"
         ></v-select>
       </div>
-      <div class="col-6 p-0 ps-1">
+
+      <!-- Máquinas Select -->
+      <div class="col-md-6">
         <v-select
           clearable
           variant="outlined"
           density="compact"
-          class="select"
-          label="Maquinas"
+          class="form-select custom-select"
+          label="Máquinas"
           :items="listaMaquinas"
           v-model="maquina"
         ></v-select>
       </div>
     </div>
 
-    <div class="main">
-      <div class="escolher-categoria">
-        <p>Deseja aplicar um filtro?</p>
-        <v-btn :class="{ active: filtroTipo === 'Mecânico' }" class="categoria-mecanico" @click="filtroDefeitos('Mecânico')"
-          >Mecânico</v-btn
+    <div>
+      <div class="mb-3">
+        <p class="text-secondary">Deseja aplicar um filtro?</p>
+        <v-btn
+          :class="{ active: filtroTipo === 'Mecânico' }"
+          class="btn btn-outline-success me-2"
+          @click="filtroDefeitos('Mecânico')"
         >
+          Mecânico
+        </v-btn>
         <v-btn
           :class="{ active: filtroTipo === 'Operacional' }"
-          class="categoria-operacional"
+          class="btn btn-outline-success"
           @click="filtroDefeitos('Operacional')"
-          >Operacional</v-btn
         >
+          Operacional
+        </v-btn>
       </div>
-      <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
-        <h1>{{ setorNome }}</h1>
-
-        <div class="maquinas-list" v-if="maquinas">
-          <div class="maquina" v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
+      <div v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
+        <h2 class="my-4 text-blue">{{ setorNome }}</h2>
+        <div v-if="maquinas">
+          <div v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
             <v-expansion-panels>
-              <v-expansion-panel class="toggle-button" :title="maquinaNome">
+              <v-expansion-panel class="mb-3" :title="maquinaNome">
                 <v-expansion-panel-text>
-                  <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
-                    <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)"></h3>
-
+                  <div v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
                     <v-expansion-panels>
-                      <v-expansion-panel class="toggle-button" :title="categoriaNome">
+                      <v-expansion-panel class="mb-2" :title="categoriaNome">
                         <v-expansion-panel-text>
                           <div v-if="problemas.length > 0">
-                            <ul class="problemas-list">
-                              <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
-                                <h4>{{ problema }}</h4>
-                                <!-- <v-img :src="getIcon(problema)"></v-img> -->
+                            <ul class="list-group">
+                              <li
+                                class="list-group-item d-flex justify-content-between align-items-center bg-white border-success"
+                                v-for="(problema, problemaId) in problemas"
+                                :key="problemaId"
+                              >
+                                <span>{{ problema }}</span>
+                                <span class="material-symbols-outlined defeito-icon text-success">{{ getIcon(problema) }}</span>
                               </li>
                             </ul>
                           </div>
                           <div v-else>
-                            <ul class="problemas-list">
-                              <li class="problema-item">
-                                <h4>
-                                  Sem Informações Cadastradas para: <span style="color: blue">{{ this.filtroTipo }}</span>
-                                </h4>
-                              </li>
-                            </ul>
+                            <p class="text-muted">Sem Informações Cadastradas para esta categoria.</p>
                           </div>
                         </v-expansion-panel-text>
                       </v-expansion-panel>
@@ -90,7 +93,7 @@
           </div>
         </div>
         <div v-else>
-          <h2>Sem máquinas no setor!</h2>
+          <h4>Sem máquinas no setor!</h4>
         </div>
       </div>
     </div>
@@ -115,8 +118,6 @@ export default {
       maquinasObject: {},
       maquinasObjectOriginal: {},
       filtroTipo: null,
-      checkbox: false,
-      model: null,
     };
   },
   mounted() {
@@ -136,6 +137,13 @@ export default {
     },
   },
   methods: {
+    getIcon(tag) {
+      if (tag.includes("Mecânico")) {
+        return "settings";
+      } else if (tag.includes("Operacional")) {
+        return "person";
+      }
+    },
     queryMaquinas() {
       axios
         .get("http://localhost:3000/api/manual_maqs")
@@ -198,3 +206,23 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: #e6f0fa;
+  padding: 30px;
+}
+h1,
+h2 {
+  color: #0d9757;
+}
+.v-btn.active {
+  background-color: #0d9757 !important;
+  color: #fff !important;
+}
+.v-expansion-panel .v-expansion-panel-text {
+  padding: 1rem;
+}
+</style>
