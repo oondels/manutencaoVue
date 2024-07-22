@@ -12,7 +12,12 @@ const app = express();
 const port = 3000;
 const server = http.createServer(app);
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:8080",
+  })
+);
 app.use(express.static(path.join(__dirname, "static")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
