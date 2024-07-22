@@ -1,104 +1,102 @@
 <template>
-  <div class="container">
-    <div class="wrapper">
-      <div class="title">
-        <v-img src="@/assets/maintenance.png"></v-img>
-        <h1>TPM - Manual de Máquinas</h1>
-      </div>
-      <div class="pesquisa">
-        <div class="select-lists">
-          <div class="setor-select select">
-            <p>Selecione um Setor</p>
-            <v-select
-              color="blue"
-              :list-props="{ maxWidth: '300px' }"
-              clearable
-              class="select"
-              label="Setores"
-              :items="listaSetores"
-              v-model="setor"
-            ></v-select>
-          </div>
-          <div class="maquina-select select">
-            <p>Selecione uma Máquina</p>
-            <v-select
-              color="blue"
-              :list-props="{ maxWidth: '300px' }"
-              clearable
-              class="select"
-              label="Maquinas"
-              :items="listaMaquinas"
-              v-model="maquina"
-            ></v-select>
-          </div>
+  <div>
+    <div class="title">
+      <v-img src="@/assets/maintenance.png"></v-img>
+      <h1>TPM - Manual de Máquinas</h1>
+    </div>
+    <div class="pesquisa">
+      <div class="select-lists">
+        <div class="setor-select select">
+          <p>Selecione um Setor</p>
+          <v-select
+            color="blue"
+            :list-props="{ maxWidth: '300px' }"
+            clearable
+            class="select"
+            label="Setores"
+            :items="listaSetores"
+            v-model="setor"
+          ></v-select>
         </div>
-
-        <div class="cadastro-painel">
-          <v-expansion-panels class="expandir-button">
-            <v-expansion-panel class="cadastrar-maquina" title="Cadastrar Máquina">
-              <v-expansion-panel-text>
-                <cadastro-maquinas-component />
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
+        <div class="maquina-select select">
+          <p>Selecione uma Máquina</p>
+          <v-select
+            color="blue"
+            :list-props="{ maxWidth: '300px' }"
+            clearable
+            class="select"
+            label="Maquinas"
+            :items="listaMaquinas"
+            v-model="maquina"
+          ></v-select>
         </div>
       </div>
 
-      <div class="main">
-        <div class="escolher-categoria">
-          <p>Deseja aplicar um filtro?</p>
-          <v-btn :class="{ active: filtroTipo === 'Mecânico' }" class="categoria-mecanico" @click="filtroDefeitos('Mecânico')"
-            >Mecânico</v-btn
-          >
-          <v-btn
-            :class="{ active: filtroTipo === 'Operacional' }"
-            class="categoria-operacional"
-            @click="filtroDefeitos('Operacional')"
-            >Operacional</v-btn
-          >
-        </div>
-        <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
-          <h1>{{ setorNome }}</h1>
+      <div class="cadastro-painel">
+        <v-expansion-panels class="expandir-button">
+          <v-expansion-panel class="cadastrar-maquina" title="Cadastrar Máquina">
+            <v-expansion-panel-text>
+              <cadastro-maquinas-component />
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </div>
+    </div>
 
-          <div class="maquinas-list" v-if="maquinas">
-            <div class="maquina" v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
-              <v-expansion-panels>
-                <v-expansion-panel class="toggle-button" :title="maquinaNome">
-                  <v-expansion-panel-text>
-                    <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
-                      <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)"></h3>
+    <div class="main">
+      <div class="escolher-categoria">
+        <p>Deseja aplicar um filtro?</p>
+        <v-btn :class="{ active: filtroTipo === 'Mecânico' }" class="categoria-mecanico" @click="filtroDefeitos('Mecânico')"
+          >Mecânico</v-btn
+        >
+        <v-btn
+          :class="{ active: filtroTipo === 'Operacional' }"
+          class="categoria-operacional"
+          @click="filtroDefeitos('Operacional')"
+          >Operacional</v-btn
+        >
+      </div>
+      <div class="setores-list" v-for="(maquinas, setorNome) in maquinasObject" :key="setorNome">
+        <h1>{{ setorNome }}</h1>
 
-                      <v-expansion-panels>
-                        <v-expansion-panel class="toggle-button" :title="categoriaNome">
-                          <v-expansion-panel-text>
-                            <div v-if="problemas.length > 0">
-                              <ul class="problemas-list">
-                                <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
-                                  <h4>{{ problema }}</h4>
-                                  <v-img :src="getIcon(problema)"></v-img>
-                                </li>
-                              </ul>
-                            </div>
-                            <div v-else>
-                              <ul class="problemas-list">
-                                <li class="problema-item">
-                                  <h4>
-                                    Sem Informações Cadastradas para: <span style="color: blue">{{ this.filtroTipo }}</span>
-                                  </h4>
-                                </li>
-                              </ul>
-                            </div>
-                          </v-expansion-panel-text>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
-                    </div>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </div>
+        <div class="maquinas-list" v-if="maquinas">
+          <div class="maquina" v-for="(categorias, maquinaNome) in maquinas" :key="maquinaNome">
+            <v-expansion-panels>
+              <v-expansion-panel class="toggle-button" :title="maquinaNome">
+                <v-expansion-panel-text>
+                  <div class="categoria" v-for="(problemas, categoriaNome) in categorias" :key="categoriaNome">
+                    <h3 @click="toggleCategoria(setorNome, maquinaNome, categoriaNome)"></h3>
+
+                    <v-expansion-panels>
+                      <v-expansion-panel class="toggle-button" :title="categoriaNome">
+                        <v-expansion-panel-text>
+                          <div v-if="problemas.length > 0">
+                            <ul class="problemas-list">
+                              <li class="problema-item" v-for="(problema, problemaId) in problemas" :key="problemaId">
+                                <h4>{{ problema }}</h4>
+                                <v-img :src="getIcon(problema)"></v-img>
+                              </li>
+                            </ul>
+                          </div>
+                          <div v-else>
+                            <ul class="problemas-list">
+                              <li class="problema-item">
+                                <h4>
+                                  Sem Informações Cadastradas para: <span style="color: blue">{{ this.filtroTipo }}</span>
+                                </h4>
+                              </li>
+                            </ul>
+                          </div>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
           </div>
-          <div v-else><h2>Sem máquinas no setor!</h2></div>
         </div>
+        <div v-else><h2>Sem máquinas no setor!</h2></div>
       </div>
     </div>
   </div>

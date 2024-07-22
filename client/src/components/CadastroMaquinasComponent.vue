@@ -136,7 +136,7 @@ export default {
       newManual: {},
     };
   },
-  created() {
+  mounted() {
     this.getCsrfToken();
   },
   methods: {
@@ -145,7 +145,7 @@ export default {
     },
     async getCsrfToken() {
       try {
-        const response = await axios.get("http://localhost:3000/csrf-token");
+        const response = await axios.get("http://localhost:3000/csrf-token", { withCredentials: true });
 
         this.csrfToken = response.data.csrfToken;
 
@@ -171,10 +171,10 @@ export default {
 
             for (let i = 0; i < this.problemas.length; i++) {
               let itensDefeito = this.problemas[i].defeitos.split("\n");
-              this.newManual[setor][this.nomeMaquina][`Problema ${i + 1} - ${this.problemas[i].name}`] = [];
+              this.newManual[setor][this.nomeMaquina][`Defeito ${i + 1} - ${this.problemas[i].name}`] = [];
               for (let j = 0; j < itensDefeito.length; j++) {
                 if (itensDefeito[j] !== "" || itensDefeito[j] !== undefined) {
-                  this.newManual[setor][this.nomeMaquina][`Problema ${i + 1} - ${this.problemas[i].name}`].push(
+                  this.newManual[setor][this.nomeMaquina][`Defeito ${i + 1} - ${this.problemas[i].name}`].push(
                     `${j + 1} - ${itensDefeito[j]} (${this.problemas[i].tipo})`
                   );
                 }
@@ -187,14 +187,18 @@ export default {
               }
             }
           });
-          console.log(this.newManual);
-          // this.submit();
+          this.submit();
         }
       }
     },
     submit() {
       axios
-        .post("http://localhost:3000/cadastro-maquina", this.newManual)
+        .post("http://localhost:3000/cadastro-maquina", this.newManual, {
+          headers: {
+            "X-CSRF-Token": this.csrfToken,
+          },
+          withCredentials: true,
+        })
         .then((response) => {
           console.log("Resposta do server:", response.data);
           alert("Máquina cadastrada com Sucesso!");
