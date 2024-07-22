@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import ManutencaoComponent from "./components/ManutencaoComponent.vue";
+import ManutencaoComponent from "./components/Manutencao.vue";
 
 export default {
   name: "App",
