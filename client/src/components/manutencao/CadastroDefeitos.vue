@@ -1,20 +1,19 @@
 <template>
-  <v-form ref="form">
-    <div class="col-12 row m-0">
-      <div class="col-6 p-0 pe-1">
+  <v-form ref="form" class="p-4" style="border-radius: 8px">
+    <div class="row g-3">
+      <div class="col-md-6">
         <v-text-field
-          variant="outlined"
-          class="mb-2"
           v-model="nomeMaquina"
           label="Nome da Máquina"
           required
           outlined
+          color="#2196F3"
+          class="mb-3"
+          style="background-color: white; border-radius: 4px"
         ></v-text-field>
       </div>
-      <div class="col-6 p-0 ps-1">
+      <div class="col-md-6">
         <v-select
-          class="input"
-          variant="outlined"
           v-model="setorSelecionado"
           :items="setores"
           label="Setor/Setores"
@@ -22,60 +21,34 @@
           required
           clearable
           outlined
+          color="#2196F3"
+          class="mb-3"
+          style="background-color: white; border-radius: 4px"
         ></v-select>
       </div>
     </div>
 
-    <div v-for="(problema, index) in problemas" :key="index" class="border pl-4 pr-4 rounded mb-2">
-      <p class="pt-3 pb-3">Defeito {{ index + 1 }}</p>
+    <div
+      v-for="(problema, index) in problemas"
+      :key="index"
+      class="p-3 mb-3"
+      style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25)"
+    >
+      <p class="fw-bold" style="color: #0d47a1">Defeito {{ index + 1 }}</p>
       <v-text-field
-        class="input"
         v-model="problema.name"
         label="Nome do Defeito"
         variant="outlined"
         required
         outlined
+        color="#2196F3"
+        class="mb-3"
+        style="background-color: white; border-radius: 4px"
       ></v-text-field>
 
       <div v-for="(category, cindex) in categories" :key="cindex">
         <div v-if="category.id !== 'checklist'">
-          <h4 class="pb-2">{{ category.label }}</h4>
-
-          <div col="12">
-            <v-text-field
-              variant="outlined"
-              density="compact"
-              v-model="category.tagInput"
-              :label="`Adicionar soluções para ${category.label}`"
-              @keyup.enter="() => addTag(category.id)"
-              @keydown.delete="() => removeLastTag(category.id)"
-              outlined
-            >
-            </v-text-field>
-          </div>
-          <div col="12">
-            <v-chip-group column>
-              <v-chip
-                v-for="(tag, indexx) in category.tags"
-                :key="indexx"
-                @click:close="removeTag(indexx)"
-                :id="category.id"
-                close
-              >
-                {{ tag }}
-              </v-chip>
-            </v-chip-group>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <v-btn @click="addProblema" class="mb-3" color="info">Adicionar Defeito</v-btn>
-
-    <div v-for="(category, cindex) in categories" :key="cindex">
-      <div v-if="category.id === 'checklist'">
-        <h4>{{ category.label }}</h4>
-        <div col="12">
+          <h5 class="pb-2" style="color: #0d47a1">{{ category.label }}</h5>
           <v-text-field
             variant="outlined"
             density="compact"
@@ -84,12 +57,21 @@
             @keyup.enter="() => addTag(category.id)"
             @keydown.delete="() => removeLastTag(category.id)"
             outlined
-          >
-          </v-text-field>
-        </div>
-        <div col="12">
-          <v-chip-group column>
-            <v-chip v-for="(tag, index) in category.tags" :key="index" @click:close="removeTag(index)" :id="category.id" close>
+            color="#2196F3"
+            class="mb-3"
+            style="background-color: white; border-radius: 4px"
+          ></v-text-field>
+          <v-chip-group column class="mb-3">
+            <v-chip
+              v-for="(tag, indexx) in category.tags"
+              :key="indexx"
+              @click:close="removeTag(indexx)"
+              :id="category.id"
+              close
+              class="me-2 mb-2"
+              color="#2196F3"
+              text-color="white"
+            >
               {{ tag }}
             </v-chip>
           </v-chip-group>
@@ -97,9 +79,43 @@
       </div>
     </div>
 
-    <div class="col-12">
-      <v-btn class="me-1" color="success" @click="validate">Cadastrar</v-btn>
-      <v-btn color="red" @click="reset">Resetar Cadastro</v-btn>
+    <v-btn @click="addProblema" class="mb-3" color="#2196F3" text-color="white">Adicionar Defeito</v-btn>
+
+    <div v-for="(category, cindex) in categories" :key="cindex">
+      <div v-if="category.id === 'checklist'">
+        <h5 style="color: #0d47a1">{{ category.label }}</h5>
+        <v-text-field
+          variant="outlined"
+          density="compact"
+          v-model="category.tagInput"
+          :label="`Adicionar soluções para ${category.label}`"
+          @keyup.enter="() => addTag(category.id)"
+          @keydown.delete="() => removeLastTag(category.id)"
+          outlined
+          color="#2196F3"
+          class="mb-3"
+          style="background-color: white; border-radius: 4px"
+        ></v-text-field>
+        <v-chip-group column class="mb-3">
+          <v-chip
+            v-for="(tag, index) in category.tags"
+            :key="index"
+            @click:close="removeTag(index)"
+            :id="category.id"
+            close
+            class="me-2 mb-2"
+            color="#2196F3"
+            text-color="white"
+          >
+            {{ tag }}
+          </v-chip>
+        </v-chip-group>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <v-btn color="success" class="m-2" text-color="white" @click="validate">Cadastrar</v-btn>
+      <v-btn color="red" class="m-2" text-color="white" @click="reset">Resetar Cadastro</v-btn>
     </div>
   </v-form>
 </template>

@@ -12,29 +12,31 @@
     </div>
 
     <div class="row mb-4">
-      <!-- Setores Select -->
       <div class="col-md-6 mb-3 mb-md-0">
         <v-select
           clearable
           variant="outlined"
           density="compact"
-          class="form-select custom-select"
+          class="custom-select"
           label="Setores"
           :items="listaSetores"
           v-model="setor"
+          outlined
+          color="#2196F3"
         ></v-select>
       </div>
 
-      <!-- Máquinas Select -->
       <div class="col-md-6">
         <v-select
           clearable
           variant="outlined"
           density="compact"
-          class="form-select custom-select"
+          class="custom-select"
           label="Máquinas"
           :items="listaMaquinas"
           v-model="maquina"
+          outlined
+          color="#2196F3"
         ></v-select>
       </div>
     </div>
@@ -44,14 +46,14 @@
         <p class="text-secondary">Deseja aplicar um filtro?</p>
         <v-btn
           :class="{ active: filtroTipo === 'Mecânico' }"
-          class="btn btn-outline-success me-2"
+          class="btn btn-outline-primary me-2"
           @click="filtroDefeitos('Mecânico')"
         >
           Mecânico
         </v-btn>
         <v-btn
           :class="{ active: filtroTipo === 'Operacional' }"
-          class="btn btn-outline-success"
+          class="btn btn-outline-primary"
           @click="filtroDefeitos('Operacional')"
         >
           Operacional
@@ -69,16 +71,23 @@
                       <v-expansion-panel class="mb-2" :title="categoriaNome">
                         <v-expansion-panel-text>
                           <div v-if="problemas.length > 0">
-                            <ul class="list-group">
-                              <li
-                                class="list-group-item d-flex justify-content-between align-items-center bg-white border-success"
-                                v-for="(problema, problemaId) in problemas"
-                                :key="problemaId"
-                              >
-                                <span>{{ problema }}</span>
-                                <span class="material-symbols-outlined defeito-icon text-success">{{ getIcon(problema) }}</span>
-                              </li>
-                            </ul>
+                            <v-card class="card mx-auto p-2" max-width="700">
+                              <v-list>
+                                <v-list-item
+                                  v-for="(problema, problemaId) in problemas"
+                                  :key="problemaId"
+                                  :value="problema"
+                                  color="primary"
+                                  rounded="xl"
+                                  class="list-group-item d-flex justify-content-between align-items-center"
+                                >
+                                  <v-list-item-title v-text="problema"></v-list-item-title>
+                                  <template v-slot:append>
+                                    <i style="color: #2196f3; font-size: 1.25rem" :class="getIcon(problema)"></i>
+                                  </template>
+                                </v-list-item>
+                              </v-list>
+                            </v-card>
                           </div>
                           <div v-else>
                             <p class="text-muted">Sem Informações Cadastradas para esta categoria.</p>
@@ -139,9 +148,9 @@ export default {
   methods: {
     getIcon(tag) {
       if (tag.includes("Mecânico")) {
-        return "settings";
+        return "bi bi-gear";
       } else if (tag.includes("Operacional")) {
-        return "person";
+        return "bi bi-person-fill";
       }
     },
     queryMaquinas() {
@@ -219,7 +228,7 @@ h2 {
   color: #0d9757;
 }
 .v-btn.active {
-  background-color: #0d9757 !important;
+  background-color: #0056b3 !important;
   color: #fff !important;
 }
 .v-expansion-panel .v-expansion-panel-text {
