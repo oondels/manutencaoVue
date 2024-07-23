@@ -69,17 +69,26 @@
                       <v-expansion-panel class="mb-2" :title="categoriaNome">
                         <v-expansion-panel-text>
                           <div v-if="problemas.length > 0">
-                            <ul class="list-group">
+                            <v-card class="mx-auto" max-width="700">
+                              <v-list density="compact">
+                                <v-list-item v-for="(item, i) in problemas" :key="i" :value="item" color="primary">
+                                  <span class="material-symbols-outlined text-success">{{ getIcon(item) }}</span>
+                                  <v-list-item-title v-text="item"></v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+                            </v-card>
+                          </div>
+                          <!-- <ul class="list-group col-md-12 mb-3">
                               <li
-                                class="list-group-item d-flex justify-content-between align-items-center bg-white border-success"
+                                class="problema-item pt-2 pb-2 pl-1 pr-1"
                                 v-for="(problema, problemaId) in problemas"
                                 :key="problemaId"
                               >
                                 <span>{{ problema }}</span>
-                                <span class="material-symbols-outlined defeito-icon text-success">{{ getIcon(problema) }}</span>
+                                <span class="material-symbols-outlined text-success">{{ getIcon(problema) }}</span>
                               </li>
-                            </ul>
-                          </div>
+                            </ul> -->
+
                           <div v-else>
                             <p class="text-muted">Sem Informações Cadastradas para esta categoria.</p>
                           </div>
@@ -208,11 +217,18 @@ export default {
 </script>
 
 <style scoped>
+.problema-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .container {
   max-width: 900px;
   margin: auto;
   background: #e6f0fa;
   padding: 30px;
+  font-family: "Poppins", sans-serif;
 }
 h1,
 h2 {
