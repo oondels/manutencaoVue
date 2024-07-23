@@ -217,11 +217,18 @@ export default {
 </script>
 
 <style scoped>
+.problema-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .container {
   max-width: 900px;
   margin: auto;
   background: #e6f0fa;
   padding: 30px;
+  font-family: "Poppins", sans-serif;
 }
 h1,
 h2 {
