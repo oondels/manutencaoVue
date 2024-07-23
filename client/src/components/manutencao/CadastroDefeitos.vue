@@ -28,69 +28,57 @@
       </div>
     </div>
 
-    <div
-      v-for="(problema, index) in problemas"
-      :key="index"
-      class="p-3 mb-3"
-      style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25)"
-    >
-      <p class="fw-bold" style="color: #0d47a1">Defeito {{ index + 1 }}</p>
-      <v-text-field
-        v-model="problema.name"
-        label="Nome do Defeito"
-        variant="outlined"
-        required
-        outlined
-        color="#2196F3"
-        class="mb-3"
-        style="background-color: white; border-radius: 4px"
-      ></v-text-field>
-
-      <div v-for="(category, cindex) in categories" :key="cindex">
-        <div v-if="category.id !== 'checklist'">
-          <h5 class="pb-2" style="color: #0d47a1">{{ category.label }}</h5>
-          <v-text-field
-            variant="outlined"
-            density="compact"
-            v-model="category.tagInput"
-            :label="`Adicionar soluções para ${category.label}`"
-            @keyup.enter="() => addTag(category.id)"
-            @keydown.delete="() => removeLastTag(category.id)"
-            outlined
-            color="#2196F3"
-            class="mb-3"
-            style="background-color: white; border-radius: 4px"
-          ></v-text-field>
-          <v-chip-group column class="mb-3">
-            <v-chip
-              v-for="(tag, indexx) in category.tags"
-              :key="indexx"
-              @click:close="removeTag(indexx)"
-              :id="category.id"
-              close
-              class="me-2 mb-2"
-              color="#2196F3"
-              text-color="white"
-            >
-              {{ tag }}
-            </v-chip>
-          </v-chip-group>
+    <div class="mb-8" v-for="(problema, problemaIndex) in problemas" :key="problemaIndex">
+      <div class="p-3 mb-3" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25)">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="pb-2" style="color: #0d47a1">Defeito {{ problemaIndex + 1 }}</h5>
+          <v-btn @click="removeProblema(problemaIndex)" v-if="problemaIndex > 0" class="btn-thin">
+            <span class="material-symbols-outlined"> delete </span>
+          </v-btn>
         </div>
-      </div>
-    </div>
 
-    <v-btn @click="addProblema" class="mb-3" color="#2196F3" text-color="white">Adicionar Defeito</v-btn>
+        <v-text-field
+          v-model="problema.name"
+          :label="'Nome do Defeito ' + (problemaIndex + 1)"
+          variant="outlined"
+          required
+          outlined
+          color="#2196F3"
+          style="background-color: white; border-radius: 4px"
+        ></v-text-field>
 
-    <div v-for="(category, cindex) in categories" :key="cindex">
-      <div v-if="category.id === 'checklist'">
-        <h5 style="color: #0d47a1">{{ category.label }}</h5>
+        <h5 class="pb-2" style="color: #0d47a1">Soluções Mecânico</h5>
         <v-text-field
           variant="outlined"
           density="compact"
-          v-model="category.tagInput"
-          :label="`Adicionar soluções para ${category.label}`"
-          @keyup.enter="() => addTag(category.id)"
-          @keydown.delete="() => removeLastTag(category.id)"
+          v-model="problema.Mecanico.input"
+          :label="`Adicionar soluções para Defeito Mecânico`"
+          @keyup.enter="() => addTag(problema.Mecanico.input, problemaIndex, 'Mecanico')"
+          outlined
+          color="#2196F3"
+          style="background-color: white; border-radius: 4px"
+        ></v-text-field>
+        <v-chip-group column>
+          <v-chip
+            v-for="(tagMecanico, tagIndexMecanico) in problema.Mecanico.defeitos || []"
+            :key="tagIndexMecanico"
+            @click="() => removeTag(tagIndexMecanico, problemaIndex, 'Mecanico')"
+            close
+            class="me-2 mb-2"
+            color="#2196F3"
+            text-color="white"
+          >
+            {{ tagMecanico }}
+          </v-chip>
+        </v-chip-group>
+
+        <h5 class="pb-2" style="color: #0d47a1">Soluções Operacionais</h5>
+        <v-text-field
+          variant="outlined"
+          density="compact"
+          v-model="problema.Operacional.input"
+          :label="`Adicionar soluções para Defeito Operacional`"
+          @keyup.enter="() => addTag(problema.Operacional.input, problemaIndex, 'Operacional')"
           outlined
           color="#2196F3"
           class="mb-3"
@@ -98,19 +86,74 @@
         ></v-text-field>
         <v-chip-group column class="mb-3">
           <v-chip
-            v-for="(tag, index) in category.tags"
-            :key="index"
-            @click:close="removeTag(index)"
-            :id="category.id"
+            v-for="(tagOperacional, tagIndexOperacional) in problema.Operacional.defeitos || []"
+            :key="tagIndexOperacional"
+            @click="() => removeTag(tagIndexOperacional, problemaIndex, 'Operacional')"
             close
             class="me-2 mb-2"
             color="#2196F3"
             text-color="white"
           >
-            {{ tag }}
+            {{ tagOperacional }}
           </v-chip>
         </v-chip-group>
       </div>
+    </div>
+
+    <v-btn @click="addProblema" class="mb-3" color="#2196F3" text-color="white">Adicionar Defeito</v-btn>
+
+    <div v-for="(item, itemIndex) in checklist" :key="itemIndex">
+      <h5 class="pb-2" style="color: #0d47a1">Itens do Checklist Operacional</h5>
+      <v-text-field
+        variant="outlined"
+        density="compact"
+        v-model="item.Operacional.input"
+        :label="`Adicionar soluções para Defeito Operacional`"
+        @keyup.enter="() => addTag(item.Operacional.input, itemIndex, 'Operacional', 1)"
+        outlined
+        color="#2196F3"
+        class="mb-3"
+        style="background-color: white; border-radius: 4px"
+      ></v-text-field>
+      <v-chip-group column class="mb-3">
+        <v-chip
+          v-for="(tagChecklist, tagIndex) in item.Operacional.itens || []"
+          :key="tagIndex"
+          @click="() => removeTag(tagIndex, itemIndex, 'Operacional', 1)"
+          close
+          class="me-2 mb-2"
+          color="#2196F3"
+          text-color="white"
+        >
+          {{ tagChecklist }}
+        </v-chip>
+      </v-chip-group>
+
+      <h5 class="pb-2" style="color: #0d47a1">Itens do Checklist Mecanico</h5>
+      <v-text-field
+        variant="outlined"
+        density="compact"
+        v-model="item.Mecanico.input"
+        :label="`Adicionar soluções para Defeito Mecanico`"
+        @keyup.enter="() => addTag(item.Mecanico.input, itemIndex, 'Mecanico', 1)"
+        outlined
+        color="#2196F3"
+        class="mb-3"
+        style="background-color: white; border-radius: 4px"
+      ></v-text-field>
+      <v-chip-group column class="mb-3 d-flex flex-wrap">
+        <v-chip
+          v-for="(tagChecklist, tagIndex) in item.Mecanico.itens || []"
+          :key="tagIndex"
+          @click="() => removeTag(tagIndex, itemIndex, 'Mecanico', 1)"
+          close
+          class="shadow-sm"
+          color="primary"
+          outlined
+        >
+          {{ tagChecklist }}
+        </v-chip>
+      </v-chip-group>
     </div>
 
     <div class="d-flex justify-content-center">
@@ -127,16 +170,12 @@ export default {
   name: "cadastro-defeitos",
   data() {
     return {
-      categories: [
-        { id: "Operacional", label: "Soluções operacionais", tagInput: "", tags: [] },
-        { id: "Mecânico", label: "Soluções mecânicas", tagInput: "", tags: [] },
-        { id: "checklist", label: "Checklist de Itens", tagInput: "", tags: [] },
-      ],
-      tagChecklist: [],
+      problemas: [{ name: "", Operacional: { defeitos: [], input: "" }, Mecanico: { defeitos: [], input: "" } }],
+      checklist: [{ Operacional: { itens: [], input: "" }, Mecanico: { itens: [], input: "" } }],
+      allProblems: [],
       nomeMaquina: null,
       setorSelecionado: null,
       setores: ["Montagem", "Costura", "Corte Automático", "Serigrafia", "Bordado", "Apoio", "Lavagem", "Pré Solado"],
-      problemas: [{ name: "", defeitos: "", tipo: "" }],
       csrfToken: "",
       campoRegra: [
         (value) => {
@@ -144,7 +183,6 @@ export default {
           return "Este Campo é Obrigatório!";
         },
       ],
-      checklistItens: null,
       newManual: {},
     };
   },
@@ -152,19 +190,38 @@ export default {
     this.getCsrfToken();
   },
   methods: {
-    addTag(categoryId) {
-      const category = this.categories.find((c) => c.id === categoryId);
-      if (category.tagInput && category.tagInput) {
-        category.tags.push(category.tagInput);
-        category.tagInput = "";
+    addTag(input, index, category, checklist) {
+      if (!checklist) {
+        const problema = this.problemas[index];
+        if (input && !problema[category].defeitos.includes(input)) {
+          problema[category].defeitos.push(`${input} (${category})`);
+          problema[category].input = "";
+        }
+      } else {
+        const item = this.checklist[index];
+        if (input && !item[category].itens.includes(input)) {
+          item[category].itens.push(`${input} (${category})`);
+          item[category].input = "";
+        }
       }
     },
-    removeLastTag(categoryId) {
-      const category = this.categories.find((c) => c.id === categoryId);
-      category.tags.pop();
+    removeTag(tagIndex, mainIndex, category, checklist) {
+      if (!checklist) {
+        const problema = this.problemas[mainIndex];
+        problema[category].defeitos.splice(tagIndex, 1);
+      } else {
+        const item = this.checklist[mainIndex];
+        item[category].itens.splice(tagIndex, 1);
+      }
     },
     addProblema() {
-      this.problemas.push({ name: "", defeitos: "", tipo: "" });
+      this.problemas.push({
+        Operacional: { name: "", defeitos: [], input: "" },
+        Mecanico: { name: "", defeitos: [], input: "" },
+      });
+    },
+    removeProblema(problemaIndex) {
+      this.problemas.splice(problemaIndex, 1);
     },
     async getCsrfToken() {
       try {
@@ -180,10 +237,10 @@ export default {
     validate() {
       if (this.$refs.form.validate()) {
         if (
-          this.setorSelecionado !== null &&
+          this.setorSelecionado &&
           this.setorSelecionado.length > 0 &&
-          this.nomeMaquina !== null &&
-          this.categories.every((category) => category.tags.length > 0)
+          this.nomeMaquina &&
+          this.problemas.every((problema) => problema.name)
         ) {
           this.newManual = {};
           this.setorSelecionado.forEach((setor) => {
@@ -191,28 +248,30 @@ export default {
             this.newManual[setor][this.nomeMaquina] = {};
             this.newManual[setor][this.nomeMaquina]["Itens a verificar"] = [];
 
-            this.problemas.forEach((problema, index) => {
-              if (problema && problema.name) {
-                this.newManual[setor][this.nomeMaquina][`Defeito ${index + 1} - ${problema.name}`] = [];
-
-                this.categories.forEach((category) => {
-                  if (category.id !== "checklist") {
-                    category.tags.forEach((tag, tagIndex) => {
-                      this.newManual[setor][this.nomeMaquina][`Defeito ${index + 1} - ${problema.name}`].push(
-                        `Solução ${tagIndex + 1} - ${tag} (${category.id})`
-                      );
-                    });
-                  } else {
-                    category.tags.forEach((tag, tagIndex) => {
-                      this.newManual[setor][this.nomeMaquina]["Itens a verificar"].push(`Item ${tagIndex + 1} - ${tag}`);
+            Object.keys(this.problemas[0]).forEach((category) => {
+              console.log(category);
+              this.problemas.forEach((problema, index) => {
+                if (!this.newManual[setor][this.nomeMaquina][`Defeito ${index + 1} - ${problema.name}`]) {
+                  this.newManual[setor][this.nomeMaquina][`Defeito ${index + 1} - ${problema.name}`] = [];
+                }
+                if (category !== "name") {
+                  if (problema && problema.name) {
+                    problema[category].defeitos.forEach((p) => {
+                      this.newManual[setor][this.nomeMaquina][`Defeito ${index + 1} - ${problema.name}`].push(`Solução - ${p}`);
                     });
                   }
-                });
-              }
+                }
+              });
+            });
+
+            Object.keys(this.checklist[0]).forEach((category) => {
+              this.checklist[0][category].itens.forEach((item) => {
+                this.newManual[setor][this.nomeMaquina]["Itens a verificar"].push(`Item - ${item}`);
+              });
             });
           });
-          console.log(this.newManual);
-          // this.submit();
+          // console.log(this.newManual);
+          this.submit();
         }
       }
     },

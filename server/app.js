@@ -49,11 +49,11 @@ app.get("/api/manual_maqs", async (req, res) => {
     const query = `
       SELECT
           s.id AS setor_id,
-          s.nome AS setor_nome,
+          s.name AS setor_nome,
           m.id AS maquina_id,
-          m.nome AS maquina_nome,
+          m.name AS maquina_nome,
           c.id AS categoria_id,
-          c.nome AS categoria_nome,
+          c.name AS categoria_nome,
           json_agg(p.*) AS problemas
       FROM Setor s
       JOIN maquina_setor sm ON s.id = sm.setor_id
