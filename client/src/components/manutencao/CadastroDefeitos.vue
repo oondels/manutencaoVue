@@ -7,6 +7,7 @@
           label="Nome da Máquina"
           required
           outlined
+          :rules="campoRegra"
           color="#2196F3"
           class="mb-3"
           style="background-color: white; border-radius: 4px"
@@ -14,6 +15,7 @@
       </div>
       <div class="col-md-6">
         <v-select
+          :rules="campoRegra"
           v-model="setorSelecionado"
           :items="setores"
           label="Setor/Setores"
@@ -32,14 +34,21 @@
       <div class="p-3 mb-3" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25)">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="pb-2" style="color: #0d47a1">Defeito {{ problemaIndex + 1 }}</h5>
-          <v-btn @click="removeProblema(problemaIndex)" v-if="problemaIndex > 0" class="btn-thin">
-            <span class="material-symbols-outlined"> delete </span>
+          <v-btn
+            @click="removeProblema(problemaIndex)"
+            variant="text"
+            density="compact"
+            v-if="problemaIndex > 0"
+            class="btn-thin"
+          >
+            <span style="color: #2196f3; font-size: 1.5rem" class="material-symbols-outlined"> delete </span>
           </v-btn>
         </div>
 
         <v-text-field
           v-model="problema.name"
           :label="'Nome do Defeito ' + (problemaIndex + 1)"
+          :rules="campoRegra"
           variant="outlined"
           required
           outlined
@@ -50,6 +59,7 @@
         <h5 class="pb-2" style="color: #0d47a1">Soluções Mecânico</h5>
         <v-text-field
           variant="outlined"
+          :rules="campoRegra"
           density="compact"
           v-model="problema.Mecanico.input"
           :label="`Adicionar soluções para Defeito Mecânico`"
@@ -75,6 +85,7 @@
         <h5 class="pb-2" style="color: #0d47a1">Soluções Operacionais</h5>
         <v-text-field
           variant="outlined"
+          :rules="campoRegra"
           density="compact"
           v-model="problema.Operacional.input"
           :label="`Adicionar soluções para Defeito Operacional`"
@@ -102,8 +113,8 @@
 
     <v-btn @click="addProblema" class="mb-3" color="#2196F3" text-color="white">Adicionar Defeito</v-btn>
 
-    <div v-for="(item, itemIndex) in checklist" :key="itemIndex">
-      <h5 class="pb-2" style="color: #0d47a1">Itens do Checklist Operacional</h5>
+    <div class="mt-4" v-for="(item, itemIndex) in checklist" :key="itemIndex">
+      <h5 style="color: #0d47a1">Itens do Checklist Operacional</h5>
       <v-text-field
         variant="outlined"
         density="compact"
@@ -112,16 +123,15 @@
         @keyup.enter="() => addTag(item.Operacional.input, itemIndex, 'Operacional', 1)"
         outlined
         color="#2196F3"
-        class="mb-3"
         style="background-color: white; border-radius: 4px"
       ></v-text-field>
-      <v-chip-group column class="mb-3">
+      <v-chip-group column>
         <v-chip
           v-for="(tagChecklist, tagIndex) in item.Operacional.itens || []"
           :key="tagIndex"
           @click="() => removeTag(tagIndex, itemIndex, 'Operacional', 1)"
           close
-          class="me-2 mb-2"
+          class="me-2"
           color="#2196F3"
           text-color="white"
         >
@@ -129,7 +139,7 @@
         </v-chip>
       </v-chip-group>
 
-      <h5 class="pb-2" style="color: #0d47a1">Itens do Checklist Mecanico</h5>
+      <h5 style="color: #0d47a1">Itens do Checklist Mecanico</h5>
       <v-text-field
         variant="outlined"
         density="compact"
@@ -138,10 +148,9 @@
         @keyup.enter="() => addTag(item.Mecanico.input, itemIndex, 'Mecanico', 1)"
         outlined
         color="#2196F3"
-        class="mb-3"
         style="background-color: white; border-radius: 4px"
       ></v-text-field>
-      <v-chip-group column class="mb-3 d-flex flex-wrap">
+      <v-chip-group column class="d-flex flex-wrap">
         <v-chip
           v-for="(tagChecklist, tagIndex) in item.Mecanico.itens || []"
           :key="tagIndex"
@@ -158,7 +167,7 @@
 
     <div class="d-flex justify-content-center">
       <v-btn color="success" class="m-2" text-color="white" @click="validate">Cadastrar</v-btn>
-      <v-btn color="red" class="m-2" text-color="white" @click="reset">Resetar Cadastro</v-btn>
+      <v-btn color="red" class="m-2" text-color="white" variant="tonal" @click="reset">Resetar Cadastro</v-btn>
     </div>
   </v-form>
 </template>
@@ -294,7 +303,7 @@ export default {
     },
     reset() {
       this.$refs.form.reset();
-      this.problemas = [{ name: "", defeitos: "" }];
+      this.problemas = [{ name: "", Operacional: { defeitos: [], input: "" }, Mecanico: { defeitos: [], input: "" } }];
     },
   },
 };

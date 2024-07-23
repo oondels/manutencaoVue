@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     getIcon(tag) {
-      if (tag.includes("Mecânico")) {
+      if (tag.includes("Mecânico") || tag.includes("Mecanico")) {
         return "bi bi-gear";
       } else if (tag.includes("Operacional")) {
         return "bi bi-person-fill";
