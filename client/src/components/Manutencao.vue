@@ -79,9 +79,9 @@
                                   :value="problema"
                                   color="primary"
                                   rounded="xl"
-                                  class="list-group-item d-flex justify-content-between align-items-center"
+                                  class="list-group-item d-flex justify-content-between align-items-center border-bottom border-1r"
                                 >
-                                  <v-list-item-title v-text="problema"></v-list-item-title>
+                                  <v-list-item-title class="text-wrap" v-text="problema"></v-list-item-title>
                                   <template v-slot:append>
                                     <i style="color: #2196f3; font-size: 1.25rem" :class="getIcon(problema)"></i>
                                   </template>
