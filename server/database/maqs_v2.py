@@ -34,7 +34,7 @@ def solucao_defeito(setor, list_maquina):
 
 # Separando as máquinas por setor
 for list_maquina in [list.split('\n') for list in manual_tpm.split('\n\n') if list]:
-    setores_maq = db[db['Máquina'] == list_maquina[0]]["Setor"].values
+    setores_maq = db[db['Maquina'] == list_maquina[0]]["Setor"].values
     
     if setores_maq.size > 0:
         if len(setores_maq) > 0:
